@@ -11,10 +11,23 @@
   --      0xFF1C1C1E page      0xFF2C2C2E raised surface (headers/sections)
   --      0xFFE5E5EA label     0xFF8E8E93 secondary label  0xFF636366 tertiary
   --      0xFF30D158 green    0xFF64D2FF teal   0xFFFF453A red   0xFFFF9F0A orange
-  --   3. Density: section headers 58dp -> 42dp, row text 15sp -> 12sp,
-  --      section titles 13sp, list rows are now full width (bigger tap targets).
+--   3. Density: section headers 58dp -> 46dp, row text 15sp -> 12sp,
+--      section titles 13sp, list rows are now full width (bigger tap targets).
 --   4. The bright green outer frame is gone (it made the menu look like a
 --      neon box and wasted ~10dp on every side).
+--   6. THE BIG ONE - section headers now use the iOS "grouped list" pattern
+--      instead of grey boxes:
+--        * header rows have NO background and NO margin, so they are full-bleed
+--        * a 1dp 0xFF38383A hairline separator sits above each header
+--        * the chevron shrank 25dp -> 20dp and turned secondary grey
+--        * option rows inside a panel get 8dp of side padding
+--      Remove a separator by deleting the 5-line "View" block above a header.
+--   7. "fill"/"fill_parent" were replaced with Android's canonical
+--      "match_parent" everywhere. The old value combined with
+--      layout_gravity="center" made rows render narrower than the panel
+--      (they looked like floating chips), and gravity="center" on the shell
+--      pushed the content down and left a dead gap under the footer - both are
+--      now gravity="top".
 --   5. FIX: all textStyle="bold" attributes were deleted. AndLua's layout loader
 --      has no setTextStyle(), so each one produced
 --        "TextView@setTextStyle is not a field or method"
@@ -29,16 +42,16 @@
   -- will break the matching Lua handler, so keep the ids as they are.
   -- ============================================================================
   LinearLayout,
-  layout_width="fill",
-  layout_height="fill",
+  layout_width="match_parent",
+  layout_height="match_parent",
   background="transparent",
   orientation="vertical";
   {
     -- Menu shell. radius 22dp = iOS-style continuous corner.
     CardView,
     radius="22dp";
-    layout_width="fill",
-    layout_height="fill",
+    layout_width="match_parent",
+    layout_height="match_parent",
     backgroundColor="0xFF1C1C1E"; -- iOS system background (was 0xFF000000)
     CardElevation="0dp",           -- flat: iOS separates layers with colour, not shadow
     layout_gravity="center";
@@ -46,8 +59,8 @@
     {
       LinearLayout;
       orientation="vertical";
-      layout_width="fill";
-      layout_height="fill";
+      layout_width="match_parent";
+      layout_height="match_parent";
       gravity="center";
       {
         -- Header bar. This whole row is the drag handle:
@@ -55,7 +68,7 @@
         -- id="fl" must stay, and its height (40dp -> 44dp) controls the grab area.
         CardView,
         radius=0;
-        layout_width="fill",
+        layout_width="match_parent",
         layout_height="44dp",
         backgroundColor="0xFF2C2C2E",
         CardElevation="0dp",
@@ -64,20 +77,20 @@
         {
           LinearLayout;
           layout_height="wrap";
-          layout_width="fill";
+          layout_width="match_parent";
           orientation="horizontal";
           layout_gravity="center";
           padding="8dp";
           {
             LinearLayout;
             layout_height="wrap";
-            layout_width="fill";
+            layout_width="match_parent";
             orientation="vertical";
             layout_gravity="center";
             {
               LinearLayout;
               layout_height="wrap";
-              layout_width="fill";
+              layout_width="match_parent";
               orientation="vertical";
               layout_gravity="center",
               {
@@ -98,8 +111,8 @@
         {
           LinearLayout;
           orientation="horizontal";
-          layout_height="fill";
-          layout_width="fill";
+          layout_height="match_parent";
+          layout_width="match_parent";
           gravity="right";
           background="transparent",
           {
@@ -132,7 +145,7 @@
         -- used to waste ~36dp of height. Duplicate this block if you need more
         -- status lines - but remember every extra row makes the menu taller.
         LinearLayout;
-        layout_width="fill";
+        layout_width="match_parent";
         layout_height="wrap";
         orientation="horizontal";
         gravity="center_vertical";
@@ -166,18 +179,16 @@
         -- "};" at the end if you are careful.
         CardView,
         radius="0dp";
-        layout_width="fill",
-        layout_height="wrap",
+        layout_width="match_parent",
+        layout_height="match_parent",
         backgroundColor="0x00000000",
-        CardElevation="0dp",
-        layout_gravity="center";
-        layout_margin="0dp";
+        CardElevation="0dp";
         id="";
         {
           LinearLayout;
           orientation="vertical";
-          layout_width="fill",
-          layout_height="fill",
+          layout_width="match_parent",
+          layout_height="match_parent",
           gravity="center";
           {
             LinearLayout;
@@ -185,27 +196,27 @@
             padding="0dp";
             {
               ScrollView;
-              layout_width="fill_parent";
-              layout_height="fill",
+              layout_width="match_parent";
+              layout_height="match_parent",
               layout_gravity="center_horizontal";
               id="";
               {
                 LinearLayout,
                 id="win_mainviewX",
-                layout_width="fill",
-                layout_height="fill";
+                layout_width="match_parent",
+                layout_height="match_parent";
                 backgroundColor="0xFF1C1C1E";
-                gravity="center";
+                gravity="top";  -- was "center" (same dead-space problem)
                 Visibility="visible";
-                padding="2dp";
+                padding="0dp";
                 {
                   LinearLayout;
                   orientation="vertical";
                   {
                     CardView,
                     id="win_mainview",
-                    layout_width="fill",
-                    layout_height="fill";
+                    layout_width="match_parent",
+                    layout_height="match_parent";
                     backgroundColor="0xFF1C1C1E",
                     CardElevation="0dp",
                     layout_gravity="center";
@@ -213,32 +224,37 @@
                     {
                       LinearLayout;
                       orientation="vertical";
-                      layout_width="fill_parent";
+                      layout_width="match_parent";
                       background="transparent",
                       {
                         LinearLayout;
-                        layout_width="fill_parent";
+                        layout_width="match_parent";
                         background="transparent";
                       };
 
                       {
+                      // 1dp hairline above a section row (iOS grouped list).
+                                              View;
+                        layout_width="match_parent";
+                        layout_height="1dp";
+                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                      };
+                      {
 
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="42dp";
-                        layout_width="fill";
-                        backgroundColor="0xFF2C2C2E",
-                        layout_gravity="center";
-                        layout_margin="2dp";
+                        // iOS disclosure row: full-bleed, no card background.
+                        layout_height="46dp";
+                        layout_width="match_parent";
                         id="espmenu";
                         {
                           ImageView;
-                          layout_width="25dp";
-                          layout_height="25dp";
+                          layout_width="20dp";
+                          layout_height="20dp";
                           src="icon/ic_to_bottom.png";
-                          colorFilter="0xA0FFFFFF";
+                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
                           layout_gravity="center";
-                          padding="5dp";
+                          padding="4dp";
                           id="espicon";
                         };
                         {
@@ -249,28 +265,32 @@
                           textSize = "13sp";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
-                          paddingLeft = "14dp";
-                          layout_width = "fill";
+                          paddingLeft = "12dp";
+                          layout_width = "match_parent";
                           layout_height = "wrap";
                         };
                       };
                       {
                         LinearLayout;
-                        layout_width="fill";
-                        layout_height="fill",
+                        layout_width="match_parent";
+                        layout_height="match_parent",
                         orientation="vertical";
                         id="menu1";
+                        // 8dp side padding so the option rows are not glued
+                        // to the panel edge (iOS list inset).
+                        paddingLeft="8dp";
+                        paddingRight="8dp";
                         visibility="gone";
                         {
                           ScrollView;
-                          layout_width="fill";
-                          layout_height="fill",
+                          layout_width="match_parent";
+                          layout_height="match_parent",
                           layout_gravity="center_horizontal";
                           id="";
                           {
                             LinearLayout;
-                            layout_height="fill";
-                            layout_width="fill";
+                            layout_height="match_parent";
+                            layout_width="match_parent";
                             orientation="vertical";
                             {
 
@@ -280,7 +300,7 @@
                               id="logo";
                               textSize = "12sp";
                               layout_gravity="center";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             };
                             {
@@ -290,7 +310,7 @@
                               id="anti1";
                               textSize = "12sp";
                               layout_gravity="center";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             };
                             {
@@ -300,7 +320,7 @@
                               id="skip";
                               textSize = "12sp";
                               layout_gravity="center";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             };
                             {
@@ -310,7 +330,7 @@
                               id="clogs";
                               textSize = "12sp";
                               layout_gravity="center";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                               checked=false;
 
@@ -336,23 +356,28 @@
                       };
 
                       {
+                      // 1dp hairline above a section row (iOS grouped list).
+                                              View;
+                        layout_width="match_parent";
+                        layout_height="1dp";
+                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                      };
+                      {
 
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="42dp";
-                        layout_width="fill";
-                        backgroundColor="0xFF2C2C2E",
-                        layout_gravity="center";
-                        layout_margin="2dp";
+                        // iOS disclosure row: full-bleed, no card background.
+                        layout_height="46dp";
+                        layout_width="match_parent";
                         id="fpsmenu";
                         {
                           ImageView;
-                          layout_width="25dp";
-                          layout_height="25dp";
+                          layout_width="20dp";
+                          layout_height="20dp";
                           src="icon/ic_to_bottom.png";
-                          colorFilter="0xA0FFFFFF";
+                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
                           layout_gravity="center";
-                          padding="5dp";
+                          padding="4dp";
                           id="fpsicon";
                         };
                         {
@@ -363,28 +388,32 @@
                           textSize = "13sp";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
-                          paddingLeft = "14dp";
-                          layout_width = "fill";
+                          paddingLeft = "12dp";
+                          layout_width = "match_parent";
                           layout_height = "wrap";
                         };
                       };
                       {
                         LinearLayout;
-                        layout_width="fill";
-                        layout_height="fill",
+                        layout_width="match_parent";
+                        layout_height="match_parent",
                         orientation="vertical";
                         id="menu4";
+                        // 8dp side padding so the option rows are not glued
+                        // to the panel edge (iOS list inset).
+                        paddingLeft="8dp";
+                        paddingRight="8dp";
                         visibility="gone";
                         {
                           ScrollView;
-                          layout_width="fill";
-                          layout_height="fill",
+                          layout_width="match_parent";
+                          layout_height="match_parent",
                           layout_gravity="center_horizontal";
                           id="";
                           {
                             LinearLayout;
-                            layout_height="fill";
-                            layout_width="fill";
+                            layout_height="match_parent";
+                            layout_width="match_parent";
                             orientation="vertical";
                             {
 
@@ -394,7 +423,7 @@
                               id="fps180";
                               textSize = "12sp";
                               layout_gravity="center";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             };
 
@@ -406,7 +435,7 @@
                               id="unlockfps";
                               textSize = "12sp";
                               layout_gravity="center";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             }; {
 
@@ -416,7 +445,7 @@
                               id="fps";
                               textSize = "12sp";
                               layout_gravity="center";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             };
 
@@ -426,22 +455,27 @@
                       };
 
                       {
+                      // 1dp hairline above a section row (iOS grouped list).
+                                              View;
+                        layout_width="match_parent";
+                        layout_height="1dp";
+                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                      };
+                      {
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="42dp";
-                        layout_width="fill";
-                        backgroundColor="0xFF2C2C2E",
-                        layout_gravity="center";
-                        layout_margin="2dp";
+                        // iOS disclosure row: full-bleed, no card background.
+                        layout_height="46dp";
+                        layout_width="match_parent";
                         id="aimmenu";
                         {
                           ImageView;
-                          layout_width="25dp";
-                          layout_height="25dp";
+                          layout_width="20dp";
+                          layout_height="20dp";
                           src="icon/ic_to_bottom.png";
-                          colorFilter="0xA0FFFFFF";
+                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
                           layout_gravity="center";
-                          padding="5dp";
+                          padding="4dp";
                           id="aimicon";
                         };
                         {
@@ -452,35 +486,39 @@
                           textSize = "13sp";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
-                          paddingLeft = "14dp";
-                          layout_width = "fill";
+                          paddingLeft = "12dp";
+                          layout_width = "match_parent";
                           layout_height = "wrap";
                         };
                       };
 
                       {
                         LinearLayout;
-                        layout_width="fill";
-                        layout_height="fill",
+                        layout_width="match_parent";
+                        layout_height="match_parent",
                         orientation="vertical";
                         id="menu2";
+                        // 8dp side padding so the option rows are not glued
+                        // to the panel edge (iOS list inset).
+                        paddingLeft="8dp";
+                        paddingRight="8dp";
                         visibility="gone";
                         {
                           ScrollView;
-                          layout_width="fill";
-                          layout_height="fill",
+                          layout_width="match_parent";
+                          layout_height="match_parent",
                           layout_gravity="center_horizontal";
                           id="";
                           {
                             LinearLayout;
-                            layout_height="fill";
-                            layout_width="fill";
+                            layout_height="match_parent";
+                            layout_width="match_parent";
                             orientation="vertical";
                             {
                               LinearLayout;
                               orientation="vertical";
-                              layout_height="fill";
-                              layout_width="fill";
+                              layout_height="match_parent";
+                              layout_width="match_parent";
                               {
                                 TextView;
                                 text=toSmallCaps("ᴀɪᴍʙᴏᴛ");
@@ -488,7 +526,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -498,14 +536,14 @@
                                 text="   ᴀɪᴍʙᴏᴛ (0%)";
                                 textColor="0xFFE5E5EA";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 layout_gravity="center";
                                 id="aimbot_text";
                               };
                               {
                                 SeekBar;
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="18dp";
                                 max=100;
                                 progress=0;
@@ -518,7 +556,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -528,14 +566,14 @@
                                 text="  ꜰᴏᴠ 3ʀᴅ ᴀᴅᴊᴜꜱᴛᴀʙʟᴇ (0%)";
                                 textColor="0xFFE5E5EA";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 layout_gravity="center";
                                 id="ipad_text";
                               };
                               {
                                 SeekBar;
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="18dp";
                                 max=100;
                                 progress=0;
@@ -548,7 +586,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -558,14 +596,14 @@
                                 text="  sɴᴏᴡʙᴏᴀʀᴅsᴘᴇᴇᴅ (0%)";
                                 textColor="0xFFE5E5EA";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 layout_gravity="center";
                                 id="snowboard_text";
                               };
                               {
                                 SeekBar;
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="18dp";
                                 max=100;
                                 progress=0;
@@ -577,22 +615,27 @@
                         }
                       },
                       {
+                      // 1dp hairline above a section row (iOS grouped list).
+                                              View;
+                        layout_width="match_parent";
+                        layout_height="1dp";
+                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                      };
+                      {
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="42dp";
-                        layout_width="fill";
-                        backgroundColor="0xFF2C2C2E",
-                        layout_gravity="center";
-                        layout_margin="2dp";
+                        // iOS disclosure row: full-bleed, no card background.
+                        layout_height="46dp";
+                        layout_width="match_parent";
                         id="othermenu";
                         {
                           ImageView;
-                          layout_width="25dp";
-                          layout_height="25dp";
+                          layout_width="20dp";
+                          layout_height="20dp";
                           src="icon/ic_to_bottom.png";
-                          colorFilter="0xA0FFFFFF";
+                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
                           layout_gravity="center";
-                          padding="5dp";
+                          padding="4dp";
                           id="othericon";
                         };
                         {
@@ -603,34 +646,38 @@
                           textSize = "13sp";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
-                          paddingLeft = "14dp";
-                          layout_width = "fill";
+                          paddingLeft = "12dp";
+                          layout_width = "match_parent";
                           layout_height = "wrap";
                         };
                       };
                       {
                         LinearLayout;
-                        layout_width="fill";
-                        layout_height="fill",
+                        layout_width="match_parent";
+                        layout_height="match_parent",
                         orientation="vertical";
                         id="menu3";
+                        // 8dp side padding so the option rows are not glued
+                        // to the panel edge (iOS list inset).
+                        paddingLeft="8dp";
+                        paddingRight="8dp";
                         visibility="gone";
                         {
                           ScrollView;
-                          layout_width="fill";
-                          layout_height="fill",
+                          layout_width="match_parent";
+                          layout_height="match_parent",
                           layout_gravity="center_horizontal";
                           id="";
                           {
                             LinearLayout;
-                            layout_height="fill";
-                            layout_width="fill";
+                            layout_height="match_parent";
+                            layout_width="match_parent";
                             orientation="vertical";
                             {
                               LinearLayout;
                               orientation="vertical";
-                              layout_height="fill";
-                              layout_width="fill";
+                              layout_height="match_parent";
+                              layout_width="match_parent";
 
                               {
                                 TextView;
@@ -639,7 +686,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -652,7 +699,7 @@
                                 id="strong";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -663,7 +710,7 @@
                                 id="chams";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -673,7 +720,7 @@
                                 id="redhack";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -684,7 +731,7 @@
                                 id="mp";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -695,7 +742,7 @@
                                 id="who";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
 
                               };
@@ -706,7 +753,7 @@
                                 id="hit";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -717,7 +764,7 @@
                                 id = "Blueprint",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width="fill",
+                                layout_width="match_parent",
                                 layout_height = "wrap"
                               },
                               {
@@ -727,7 +774,7 @@
                                 id="Scope";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
 
                               };
@@ -739,7 +786,7 @@
                                 id="fastsw";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -749,7 +796,7 @@
                                 id="speed";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -759,7 +806,7 @@
                                 id="spread";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -769,7 +816,7 @@
                                 id="noreload";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -779,7 +826,7 @@
                                 id="norecoil";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -789,7 +836,7 @@
                                 id="shake";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -799,7 +846,7 @@
                                 id="Delaysprintfire";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -809,7 +856,7 @@
                                 id="nsmoke";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -819,7 +866,7 @@
                                 id="nocrouch";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -829,7 +876,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -842,7 +889,7 @@
                                 id="pump";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -852,7 +899,7 @@
                                 id="Battle";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -862,7 +909,7 @@
                                 id="Walk";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                               };
                               {
@@ -872,7 +919,7 @@
                                 id="nop";
                                 layout_gravity="center";
                                 textSize = "12sp";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
 
                               };
@@ -883,23 +930,28 @@
 
 
                       {
+                      // 1dp hairline above a section row (iOS grouped list).
+                                              View;
+                        layout_width="match_parent";
+                        layout_height="1dp";
+                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                      };
+                      {
 
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="42dp";
-                        layout_width="fill";
-                        backgroundColor="0xFF2C2C2E",
-                        layout_gravity="center";
-                        layout_margin="2dp";
+                        // iOS disclosure row: full-bleed, no card background.
+                        layout_height="46dp";
+                        layout_width="match_parent";
                         id="brmenu";
                         {
                           ImageView;
-                          layout_width="25dp";
-                          layout_height="25dp";
+                          layout_width="20dp";
+                          layout_height="20dp";
                           src="icon/ic_to_bottom.png";
-                          colorFilter="0xA0FFFFFF";
+                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
                           layout_gravity="center";
-                          padding="5dp";
+                          padding="4dp";
                           id="bricon";
                         };
                         {
@@ -910,34 +962,38 @@
                           textSize = "13sp";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
-                          paddingLeft = "14dp";
-                          layout_width = "fill";
+                          paddingLeft = "12dp";
+                          layout_width = "match_parent";
                           layout_height = "wrap";
                         };
                       };
                       {
                         LinearLayout;
-                        layout_width="fill";
-                        layout_height="fill",
+                        layout_width="match_parent";
+                        layout_height="match_parent",
                         orientation="vertical";
                         id="menu5";
+                        // 8dp side padding so the option rows are not glued
+                        // to the panel edge (iOS list inset).
+                        paddingLeft="8dp";
+                        paddingRight="8dp";
                         visibility="gone";
                         {
                           ScrollView;
-                          layout_width="fill";
-                          layout_height="fill",
+                          layout_width="match_parent";
+                          layout_height="match_parent",
                           layout_gravity="center_horizontal";
                           id="";
                           {
                             LinearLayout;
-                            layout_height="fill";
-                            layout_width="fill";
+                            layout_height="match_parent";
+                            layout_width="match_parent";
                             orientation="vertical";
                             {
                               LinearLayout;
                               orientation="vertical";
-                              layout_height="fill";
-                              layout_width="fill";
+                              layout_height="match_parent";
+                              layout_width="match_parent";
 
 
                             };
@@ -948,7 +1004,7 @@
                               id="";
                               textSize = "12sp";
                               layout_gravity="left|center_vertical";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                               paddingLeft="10dp";
                               paddingTop="8dp";
@@ -961,7 +1017,7 @@
                               id="safe";
                               layout_gravity="center";
                               textSize = "12sp";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             };
                             {
@@ -971,7 +1027,7 @@
                               id="safee";
                               layout_gravity="center";
                               textSize = "12sp";
-                              layout_width="fill";
+                              layout_width="match_parent";
                               layout_height="wrap";
                             };
                           };
@@ -980,22 +1036,27 @@
 
 
                       {
+                      // 1dp hairline above a section row (iOS grouped list).
+                                              View;
+                        layout_width="match_parent";
+                        layout_height="1dp";
+                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                      };
+                      {
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="42dp";
-                        layout_width="fill";
-                        backgroundColor="0xFF2C2C2E",
-                        layout_gravity="center";
-                        layout_margin="2dp";
+                        // iOS disclosure row: full-bleed, no card background.
+                        layout_height="46dp";
+                        layout_width="match_parent";
                         id="skinmenu";
                         {
                           ImageView;
-                          layout_width="25dp";
-                          layout_height="25dp";
+                          layout_width="20dp";
+                          layout_height="20dp";
                           src="icon/ic_to_bottom.png";
-                          colorFilter="0xA0FFFFFF";
+                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
                           layout_gravity="center";
-                          padding="5dp";
+                          padding="4dp";
                           id="skinicon";
                         };
                         {
@@ -1006,34 +1067,38 @@
                           textSize = "13sp";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
-                          paddingLeft = "14dp";
-                          layout_width = "fill";
+                          paddingLeft = "12dp";
+                          layout_width = "match_parent";
                           layout_height = "wrap";
                         };
                       };
                       {
                         LinearLayout;
-                        layout_width="fill";
-                        layout_height="fill",
+                        layout_width="match_parent";
+                        layout_height="match_parent",
                         orientation="vertical";
                         id="menu6";
+                        // 8dp side padding so the option rows are not glued
+                        // to the panel edge (iOS list inset).
+                        paddingLeft="8dp";
+                        paddingRight="8dp";
                         visibility="gone";
                         {
                           ScrollView;
-                          layout_width="fill";
-                          layout_height="fill",
+                          layout_width="match_parent";
+                          layout_height="match_parent",
                           layout_gravity="center_horizontal";
                           id="";
                           {
                             LinearLayout;
-                            layout_height="fill";
-                            layout_width="fill";
+                            layout_height="match_parent";
+                            layout_width="match_parent";
                             orientation="vertical";
                             {
                               LinearLayout;
                               orientation="vertical";
-                              layout_height="fill";
-                              layout_width="fill";
+                              layout_height="match_parent";
+                              layout_width="match_parent";
 
 
 
@@ -1045,7 +1110,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1057,7 +1122,7 @@
                                 id = "shepherd",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
                               {
@@ -1067,7 +1132,7 @@
                                 id = "kuiji",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1078,7 +1143,7 @@
                                 id = "sophia",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1089,7 +1154,7 @@
                                 id = "spectre",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1100,7 +1165,7 @@
                                 id = "templar",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1111,7 +1176,7 @@
                                 id = "siren",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1122,7 +1187,7 @@
                                 id = "ghost",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1133,7 +1198,7 @@
                                 id = "lazarus",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1144,7 +1209,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1157,7 +1222,7 @@
                                 id = "chunli",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1168,7 +1233,7 @@
                                 id = "ryu",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1179,7 +1244,7 @@
                                 id = "cammy",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1190,7 +1255,7 @@
                                 id = "akuma",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1201,7 +1266,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1213,7 +1278,7 @@
                                 id = "homelander",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
                               {
@@ -1223,7 +1288,7 @@
                                 id = "starlight",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
                               {
@@ -1233,7 +1298,7 @@
                                 id = "blacknoir",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1244,7 +1309,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1256,7 +1321,7 @@
                                 id = "vivian",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1266,7 +1331,7 @@
                                 id = "pader",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1276,7 +1341,7 @@
                                 id = "nikto",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1286,7 +1351,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1299,7 +1364,7 @@
                                 id = "ak117lava",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1310,7 +1375,7 @@
                                 id = "ak117",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1321,7 +1386,7 @@
                                 id = "bp50",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1332,7 +1397,7 @@
                                 id = "ffar",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1343,7 +1408,7 @@
                                 id = "grau",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1354,7 +1419,7 @@
                                 id = "krig6",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1365,7 +1430,7 @@
                                 id = "type19",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1376,7 +1441,7 @@
                                 id = "oden",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1387,7 +1452,7 @@
                                 id = "xm4",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1398,7 +1463,7 @@
                                 id = "ak47",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1409,7 +1474,7 @@
                                 id = "lw3",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1420,7 +1485,7 @@
                                 id = "dlq33",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1431,7 +1496,7 @@
                                 id = "vmp",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1442,7 +1507,7 @@
                                 id = "uss9",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1453,7 +1518,7 @@
                                 id = "kilo",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1464,7 +1529,7 @@
                                 id = "switchh",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1475,7 +1540,7 @@
                                 id = "jak12",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1486,7 +1551,7 @@
                                 id = "cx9",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1497,7 +1562,7 @@
                                 id = "qq9",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1508,7 +1573,7 @@
                                 id = "mg42",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1519,7 +1584,7 @@
                                 id = "m13",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1530,7 +1595,7 @@
                                 id = "fennec",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1541,7 +1606,7 @@
                                 id = "rytec",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1552,7 +1617,7 @@
                                 id = "holger",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1563,7 +1628,7 @@
                                 id = "em2",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1574,7 +1639,7 @@
                                 id = "cbr",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1585,7 +1650,7 @@
                                 id = "asval",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1596,7 +1661,7 @@
                                 id = "peace",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1607,7 +1672,7 @@
                                 id = "ram7",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1618,7 +1683,7 @@
                                 id = "type25",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1629,7 +1694,7 @@
                                 id = "so14",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1639,7 +1704,7 @@
                                 id = "lachmann",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1650,7 +1715,7 @@
                                 id = "dp27",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1662,7 +1727,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1675,7 +1740,7 @@
                                 id = "krm",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1686,7 +1751,7 @@
                                 id = "krmred",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1697,7 +1762,7 @@
                                 id = "krmload",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1708,7 +1773,7 @@
                                 id = "locus",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1719,7 +1784,7 @@
                                 id = "locusdemon",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1732,7 +1797,7 @@
                                 id = "by15",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1743,7 +1808,7 @@
                                 id = "hssong",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1754,7 +1819,7 @@
                                 id = "dlqholi",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1765,7 +1830,7 @@
                                 id = "dlqzealot",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1776,7 +1841,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1789,7 +1854,7 @@
                                 id = "tang",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
 
@@ -1800,7 +1865,7 @@
                                 id = "longq",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1810,7 +1875,7 @@
                                 id = "spear",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1820,7 +1885,7 @@
                                 id = "scissors",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1830,7 +1895,7 @@
                                 id = "tomahawk",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1840,7 +1905,7 @@
                                 id = "saber",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1850,7 +1915,7 @@
                                 id = "fiery",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               },
                               {
@@ -1860,7 +1925,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1873,7 +1938,7 @@
                                 id = "jetpack",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1883,7 +1948,7 @@
                                 id = "farflight",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1893,7 +1958,7 @@
                                 id = "sand",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap",
                               };
                             };
@@ -1903,22 +1968,27 @@
 
 
                       {
+                      // 1dp hairline above a section row (iOS grouped list).
+                                              View;
+                        layout_width="match_parent";
+                        layout_height="1dp";
+                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                      };
+                      {
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="42dp";
-                        layout_width="fill";
-                        backgroundColor="0xFF2C2C2E",
-                        layout_gravity="center";
-                        layout_margin="2dp";
+                        // iOS disclosure row: full-bleed, no card background.
+                        layout_height="46dp";
+                        layout_width="match_parent";
                         id="antennamenu";
                         {
                           ImageView;
-                          layout_width="25dp";
-                          layout_height="25dp";
+                          layout_width="20dp";
+                          layout_height="20dp";
                           src="icon/ic_to_bottom.png";
-                          colorFilter="0xA0FFFFFF";
+                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
                           layout_gravity="center";
-                          padding="5dp";
+                          padding="4dp";
                           id="antennaicon";
                         };
                         {
@@ -1929,34 +1999,38 @@
                           textSize = "13sp";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
-                          paddingLeft = "14dp";
-                          layout_width = "fill";
+                          paddingLeft = "12dp";
+                          layout_width = "match_parent";
                           layout_height = "wrap";
                         };
                       };
                       {
                         LinearLayout;
-                        layout_width="fill";
-                        layout_height="fill",
+                        layout_width="match_parent";
+                        layout_height="match_parent",
                         orientation="vertical";
                         id="menu7";
+                        // 8dp side padding so the option rows are not glued
+                        // to the panel edge (iOS list inset).
+                        paddingLeft="8dp";
+                        paddingRight="8dp";
                         visibility="gone";
                         {
                           ScrollView;
-                          layout_width="fill";
-                          layout_height="fill",
+                          layout_width="match_parent";
+                          layout_height="match_parent",
                           layout_gravity="center_horizontal";
                           id="";
                           {
                             LinearLayout;
-                            layout_height="fill";
-                            layout_width="fill";
+                            layout_height="match_parent";
+                            layout_width="match_parent";
                             orientation="vertical";
                             {
                               LinearLayout;
                               orientation="vertical";
-                              layout_height="fill";
-                              layout_width="fill";
+                              layout_height="match_parent";
+                              layout_width="match_parent";
                               {
 
                                 TextView;
@@ -1965,7 +2039,7 @@
                                 id="";
                                 textSize = "12sp";
                                 layout_gravity="left|center_vertical";
-                                layout_width="fill";
+                                layout_width="match_parent";
                                 layout_height="wrap";
                                 paddingLeft="10dp";
                                 paddingTop="8dp";
@@ -1978,7 +2052,7 @@
                                 id = "offcamo",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1988,7 +2062,7 @@
                                 id = "diamond",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -1998,7 +2072,7 @@
                                 id = "redsprite",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -2008,7 +2082,7 @@
                                 id = "emerald",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -2018,7 +2092,7 @@
                                 id = "assault",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
                               {
@@ -2028,7 +2102,7 @@
                                 id = "scorch",
                                 textSize = "12sp",
                                 layout_gravity = "center",
-                                layout_width = "fill",
+                                layout_width = "match_parent",
                                 layout_height = "wrap"
                               };
 
@@ -2041,7 +2115,7 @@
                                 backgroundColor = "0xFFFF2A2A";
                                 id = "closeui";
                                 textSize = "12sp";
-                                layout_width = "fill";
+                                layout_width = "match_parent";
                                 layout_height = "wrap";
                               };
                             };
@@ -2054,7 +2128,7 @@
                         textColor="0xFF8E8E93";
                         textSize="8sp";
                         gravity="center";
-                        layout_width="fill";
+                        layout_width="match_parent";
                         layout_height="26dp";
                       };
 

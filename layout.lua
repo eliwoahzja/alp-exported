@@ -31,34 +31,36 @@
   -- game.onClick, tg.onClick, tg1.onClick, ...). Renaming one breaks the handler.
   -- ============================================================================
   FrameLayout;
-  layout_width="fill";
-  layout_height="fill";
+  layout_width="match_parent";
+  layout_height="match_parent";
   backgroundColor="0xFF000000"; -- iOS dark base (was translucent 0x55030806)
 
   {
     -- Optional animated background. Nothing in main.lua plays it yet - add a
     -- MediaPlayer in main.lua if you want motion behind the UI.
     VideoView;
-    layout_height="fill";
-    layout_width="fill";
+    layout_height="match_parent";
+    layout_width="match_parent";
     id="video";
   };
 
   {
     -- Main content column. padding 20dp = the iOS screen margin.
     LinearLayout;
-    layout_width="fill";
-    layout_height="fill";
+    layout_width="match_parent";
+    layout_height="match_parent";
     orientation="vertical";
     padding="20dp";
     -- Soft dim layer (40% black) so white text stays readable if the video
     -- above is ever used. Set it to "0x00000000" for a completely clear glass look.
-    backgroundColor="0x66000000";
+    backgroundColor="0xCC000000"; -- 80% black: keeps text readable over
+                                  -- the video; lower it (e.g. 0x99000000)
+                                  -- for a lighter, glassier look
 
     {
       -- Header section with title and status
       LinearLayout;
-      layout_width="fill";
+      layout_width="match_parent";
       layout_height="wrap";
       orientation="vertical";
       layout_marginBottom="16dp";
@@ -66,7 +68,7 @@
       {
         -- App title row
         LinearLayout;
-        layout_width="fill";
+        layout_width="match_parent";
         layout_height="wrap";
         orientation="horizontal";
         gravity="center_vertical";
@@ -78,7 +80,7 @@
           id="title";
           text="KIRO PRIVATE";
           textColor="0xFFFFFFFF";
-          textSize="28sp";
+          textSize="22sp"; -- was 28sp: too shouty over the video
           layout_width="wrap";
           layout_height="wrap";
           -- NOTE: letter spacing is applied from Lua (applyTypography in
@@ -105,7 +107,7 @@
             -- font weight is set in main.lua -> applyTypography()
             gravity="center";
             layout_width="wrap";
-            layout_height="fill";
+            layout_height="match_parent";
             paddingLeft="10dp";
             paddingRight="10dp";
           };
@@ -115,7 +117,7 @@
       {
         -- Subtitle/status row
         LinearLayout;
-        layout_width="fill";
+        layout_width="match_parent";
         layout_height="wrap";
         orientation="horizontal";
         gravity="center_vertical";
@@ -167,136 +169,151 @@
     {
       -- Action buttons row (START/STOP) - iOS style card buttons
       LinearLayout;
-      layout_width="fill";
+      layout_width="match_parent";
       layout_height="wrap";
       orientation="horizontal";
       layout_marginBottom="20dp";
 
       {
-        -- START button - iOS green accent
+        -- START button - iOS style: icon on the left, label + caption on the right
         CardView;
         id="start";
         layout_width="0dp";
-        layout_height="110dp";
+        layout_height="84dp";  -- was 110dp: shorter, less empty space
         layout_weight="1";
         layout_marginRight="8dp";
         radius="16dp"; -- iOS standard corner radius
         CardElevation="0dp";
         CardBackgroundColor="0xFF1C1C1E"; -- iOS card background
-        layout_gravity="center";
 
         {
           LinearLayout;
-          layout_width="fill";
-          layout_height="fill";
-          orientation="vertical";
-          gravity="center";
-          padding="16dp";
+          layout_width="match_parent";
+          layout_height="match_parent";
+          orientation="horizontal";
+          gravity="center_vertical";
+          padding="14dp";
 
           {
-            -- Icon container
+            -- Icon bubble
             CardView;
-            layout_width="48dp";
-            layout_height="48dp";
-            radius="24dp";
+            layout_width="44dp";
+            layout_height="44dp";
+            radius="22dp";
             CardElevation="0dp";
             CardBackgroundColor="0xFF30D158"; -- iOS green accent
-            layout_gravity="center";
 
             {
               ImageView;
               src="icon/start.png";
-              layout_width="24dp";
-              layout_height="24dp";
+              layout_width="22dp";
+              layout_height="22dp";
               layout_gravity="center";
               colorFilter="0xFF000000"; -- Black icon on green
             };
           };
 
           {
-            TextView;
-            id="strt";
-            text="START";
-            textColor="0xFF30D158";
-            textSize="17sp";
-            layout_width="wrap";
+            -- Label + caption stacked next to the icon
+            LinearLayout;
+            layout_width="0dp";
             layout_height="wrap";
-            layout_marginTop="10dp";
-          };
+            layout_weight="1";
+            orientation="vertical";
+            layout_gravity="center_vertical";
+            layout_marginLeft="12dp";
 
-          {
-            TextView;
-            id="strttxt";
-            text="Activate Injector";
-            textColor="0xFF8E8E93";
-            textSize="11sp";
-            layout_width="wrap";
-            layout_height="wrap";
-            layout_marginTop="2dp";
+            {
+              TextView;
+              id="strt";
+              text="START";
+              textColor="0xFF30D158";
+              textSize="17sp";
+              layout_width="wrap";
+              layout_height="wrap";
+            };
+
+            {
+              TextView;
+              id="strttxt";
+              text="Activate Injector";
+              textColor="0xFF8E8E93";
+              textSize="11sp";
+              layout_width="wrap";
+              layout_height="wrap";
+              layout_marginTop="2dp";
+            };
           };
         };
       };
 
       {
-        -- STOP button - iOS red accent
+        -- STOP button - same layout as START, red accent
         CardView;
         id="stop";
         layout_width="0dp";
-        layout_height="110dp";
+        layout_height="84dp";
         layout_weight="1";
         layout_marginLeft="8dp";
         radius="16dp";
         CardElevation="0dp";
         CardBackgroundColor="0xFF1C1C1E";
-        layout_gravity="center";
 
         {
           LinearLayout;
-          layout_width="fill";
-          layout_height="fill";
-          orientation="vertical";
-          gravity="center";
-          padding="16dp";
+          layout_width="match_parent";
+          layout_height="match_parent";
+          orientation="horizontal";
+          gravity="center_vertical";
+          padding="14dp";
 
           {
             CardView;
-            layout_width="48dp";
-            layout_height="48dp";
-            radius="24dp";
+            layout_width="44dp";
+            layout_height="44dp";
+            radius="22dp";
             CardElevation="0dp";
             CardBackgroundColor="0xFFFF453A"; -- iOS red accent
-            layout_gravity="center";
 
             {
               ImageView;
               src="icon/stop.png";
-              layout_width="24dp";
-              layout_height="24dp";
+              layout_width="22dp";
+              layout_height="22dp";
               layout_gravity="center";
               colorFilter="0xFFFFFFFF";
             };
           };
 
           {
-            TextView;
-            id="stp";
-            text="STOP";
-            textColor="0xFFFF453A";
-            textSize="17sp";
-            layout_width="wrap";
+            LinearLayout;
+            layout_width="0dp";
             layout_height="wrap";
-            layout_marginTop="10dp";
-          };
+            layout_weight="1";
+            orientation="vertical";
+            layout_gravity="center_vertical";
+            layout_marginLeft="12dp";
 
-          {
-            TextView;
-            id="stptxt";
-            text="Deactivate Injector";
-            textColor="0xFF8E8E93";
-            textSize="11sp";
-            layout_width="wrap";
-            layout_height="wrap";
-            layout_marginTop="2dp";
+            {
+              TextView;
+              id="stp";
+              text="STOP";
+              textColor="0xFFFF453A";
+              textSize="17sp";
+              layout_width="wrap";
+              layout_height="wrap";
+            };
+
+            {
+              TextView;
+              id="stptxt";
+              text="Deactivate Injector";
+              textColor="0xFF8E8E93";
+              textSize="11sp";
+              layout_width="wrap";
+              layout_height="wrap";
+              layout_marginTop="2dp";
+            };
           };
         };
       };
@@ -318,7 +335,7 @@
     {
       -- Quick action cards - iOS list style
       LinearLayout;
-      layout_width="fill";
+      layout_width="match_parent";
       layout_height="wrap";
       orientation="vertical";
       layout_marginBottom="16dp";
@@ -327,7 +344,7 @@
         -- Direct Game card
         CardView;
         id="game";
-        layout_width="fill";
+        layout_width="match_parent";
         layout_height="56dp";
         radius="12dp";
         CardElevation="0dp";
@@ -336,8 +353,8 @@
 
         {
           LinearLayout;
-          layout_width="fill";
-          layout_height="fill";
+          layout_width="match_parent";
+          layout_height="match_parent";
           orientation="horizontal";
           gravity="center_vertical";
           paddingLeft="16dp";
@@ -409,7 +426,7 @@
         -- Telegram card
         CardView;
         id="tg";
-        layout_width="fill";
+        layout_width="match_parent";
         layout_height="56dp";
         radius="12dp";
         CardElevation="0dp";
@@ -418,8 +435,8 @@
 
         {
           LinearLayout;
-          layout_width="fill";
-          layout_height="fill";
+          layout_width="match_parent";
+          layout_height="match_parent";
           orientation="horizontal";
           gravity="center_vertical";
           paddingLeft="16dp";
@@ -490,7 +507,7 @@
         -- Developer info card
         CardView;
         id="devInfo";
-        layout_width="fill";
+        layout_width="match_parent";
         layout_height="56dp";
         radius="12dp";
         CardElevation="0dp";
@@ -499,8 +516,8 @@
 
         {
           LinearLayout;
-          layout_width="fill";
-          layout_height="fill";
+          layout_width="match_parent";
+          layout_height="match_parent";
           orientation="horizontal";
           gravity="center_vertical";
           paddingLeft="16dp";
@@ -568,7 +585,7 @@
         -- tg1.onClick() -> opens the Telegram link. Rename it here AND in
         -- main.lua if you ever want a separate handler for this card.
         id="tg1";
-        layout_width="fill";
+        layout_width="match_parent";
         layout_height="56dp";
         radius="12dp";
         CardElevation="0dp";
@@ -576,8 +593,8 @@
 
         {
           LinearLayout;
-          layout_width="fill";
-          layout_height="fill";
+          layout_width="match_parent";
+          layout_height="match_parent";
           orientation="horizontal";
           gravity="center_vertical";
           paddingLeft="16dp";
@@ -646,9 +663,19 @@
     };
 
     {
+      -- Spacer with weight 1: pushes everything below to the bottom of the
+      -- screen, so the branding line always sits at the very bottom instead of
+      -- floating right under the last card.
+      Space;
+      layout_width="match_parent";
+      layout_height="0dp";
+      layout_weight="1";
+    };
+
+    {
       -- Footer with branding (iOS style - subtle)
       LinearLayout;
-      layout_width="fill";
+      layout_width="match_parent";
       layout_height="wrap";
       gravity="center_horizontal";
       orientation="vertical";
