@@ -92,11 +92,11 @@ end
 -- The floating menu used to size itself as a percentage of the screen
 -- ("85%w" of the display), which made it huge. It is now a fixed, smaller size.
 -- THESE TWO NUMBERS ARE THE ONLY THING YOU NEED TO EDIT to resize the menu.
-MENU_WIDTH_DP  = 264   -- was ~63% of the screen width. Try 240 (tighter) or 320.
-MENU_HEIGHT_DP = 460   -- was full screen height. Try 420 (shorter) or 560 (taller).
-                        -- Keep the height close to the height of your content
-                        -- (header 44 + status 20 + 7 sections x 46 + footer):
-                        -- a much bigger value just adds empty space at the bottom.
+MENU_WIDTH_DP  = 272   -- was ~63% of the screen width. Try 250 (tighter) or 320.
+MENU_HEIGHT_DP = 400   -- collapsed height = header 44 + 7 sections x 40 = 324dp.
+                        -- Opening a section scrolls, so you do NOT need to grow
+                        -- this for long option lists - a taller window just adds
+                        -- empty space below the last section.
 
 -- Converts dp (device-independent pixels, the unit Android scales for you) into
 -- real pixels for the current screen. Layout files understand "34dp" directly,

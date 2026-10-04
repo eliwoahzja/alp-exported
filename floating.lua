@@ -1,46 +1,55 @@
 {
   -- ============================================================================
-  -- FLOATING MOD MENU  (redesigned: smaller + iOS-style minimal)
+  -- FLOATING MOD MENU - iOS-style minimal, rebuilt like an iOS Settings screen
   -- ----------------------------------------------------------------------------
-  -- WHAT CHANGED vs the old version
-  --   1. Size: the menu no longer uses "85%w"/"75%w" of the screen. It now fills
-  --      whatever window size main.lua gives it, and main.lua sets that window to
-  --      MENU_WIDTH_DP x MENU_HEIGHT_DP (300 x 520). To resize the menu, change
-  --      those two numbers in main.lua - not this file.
-  --   2. Colours: neon "hacker" colours replaced with the iOS dark palette.
-  --      0xFF1C1C1E page      0xFF2C2C2E raised surface (headers/sections)
-  --      0xFFE5E5EA label     0xFF8E8E93 secondary label  0xFF636366 tertiary
-  --      0xFF30D158 green    0xFF64D2FF teal   0xFFFF453A red   0xFFFF9F0A orange
---   3. Density: section headers 58dp -> 46dp, row text 15sp -> 12sp,
---      section titles 13sp, list rows are now full width (bigger tap targets).
---   4. The bright green outer frame is gone (it made the menu look like a
---      neon box and wasted ~10dp on every side).
---   6. THE BIG ONE - section headers now use the iOS "grouped list" pattern
---      instead of grey boxes:
---        * header rows have NO background and NO margin, so they are full-bleed
---        * a 1dp 0xFF38383A hairline separator sits above each header
---        * the chevron shrank 25dp -> 20dp and turned secondary grey
---        * option rows inside a panel get 8dp of side padding
---      Remove a separator by deleting the 5-line "View" block above a header.
---   7. "fill"/"fill_parent" were replaced with Android's canonical
---      "match_parent" everywhere. The old value combined with
---      layout_gravity="center" made rows render narrower than the panel
---      (they looked like floating chips), and gravity="center" on the shell
---      pushed the content down and left a dead gap under the footer - both are
---      now gravity="top".
---   5. FIX: all textStyle="bold" attributes were deleted. AndLua's layout loader
---      has no setTextStyle(), so each one produced
---        "TextView@setTextStyle is not a field or method"
---      in the log and was then ignored (the titles were never bold). The section
---      titles are now styled from Lua - see styleSectionHeaders() in main.lua.
---      Also remember: a typo like "lyout_width" (missing 'a') is NOT a layout
---      param, so AndLua tries setLyout_width() and logs
---      "ImageView@setLayout_width is not a field or method".
+  -- THE STRUCTURE (top to bottom), so you can navigate this file quickly:
+  --   menufloating  black rounded sheet (radius 22dp, #000000)
+  --     +- fl       header row, 44dp, #1C1C1E. Also the DRAG HANDLE:
+  --     |           main.lua -> fl.OnTouchListener moves the window.
+  --     |           Contains the title plus the hide (eye.png) and
+  --     |           minimize (t1) buttons.
+  --     +- ScrollView -> win_mainviewX -> win_mainview -> the 7 sections:
+  --           a section = one header row (espmenu, fpsmenu, aimmenu,
+  --           othermenu, brmenu, skinmenu, antennamenu) followed by its
+  --           option panel (menu1 .. menu7). Panels start visibility="gone";
+  --           the onClick handlers in main.lua show/hide them.
   --
-  -- IMPORTANT: every id= in this file is referenced by main.lua
-  -- (onClick / OnCheckedChangeListener / seekbars). Renaming or deleting an id
-  -- will break the matching Lua handler, so keep the ids as they are.
-  -- ============================================================================
+  -- WHAT CHANGED vs the old neon version
+  --   1. Size: the menu no longer uses "85%w"/"75%w" of the screen. It fills
+  --      whatever window size main.lua gives it, and main.lua sets that window
+  --      with MENU_WIDTH_DP / MENU_HEIGHT_DP. Change those two numbers there.
+  --   2. Colours: the neon "hacker" palette was replaced with the iOS dark one.
+  --      0xFF000000 page (black sheet)   0xFF1C1C1E card / raised surface
+  --      0xFFE5E5EA primary label         0xFF8E8E93 secondary label
+  --      0xFF636366 tertiary label       0xFF38383A hairline separator
+  --      0xFF30D158 green   0xFF64D2FF teal   0xFFFF453A red   0xFFFF9F0A orange
+  --   3. iOS grouped list: black sheet + #1C1C1E cards for the expanded option
+  --      groups, with a 16dp side inset.
+  --   4. Section headers are small grey labels (12sp, secondary grey) instead of
+  --      bold white 15sp, and the disclosure chevron sits on the RIGHT (18dp,
+  --      tertiary grey) - that is where iOS puts it.
+  --   5. 1dp separators are inset 16dp so they line up with the label text,
+  --      and option rows use 13sp primary-label text.
+  --   6. Deleted the "SECURE VIP / PRIVATE BUILD..." status strip and the
+  --      "KIRO - PRIVATE - PREMIUM" footer: a floating panel should show one
+  --      idea. Want them back? They are in git history (commit d43797c).
+  --   7. "fill"/"fill_parent" became Android's canonical "match_parent", and the
+  --      shell + list gravity became "top" ("center" is what pushed the content
+  --      down and left a dead gap at the bottom).
+  --   8. All textStyle="bold" attributes were deleted - AndLua's layout loader
+  --      has no setTextStyle(), so it logged
+  --      "TextView@setTextStyle is not a field or method" and ignored them.
+  --      Weights are applied from Lua (applyTypography / styleSectionHeaders in
+  --      main.lua). A typo like "lyout_width" also breaks the loader.
+  --
+  -- HOW TO EDIT
+  --   * Menu size ......... MENU_WIDTH_DP / MENU_HEIGHT_DP in main.lua.
+  --   * A new section .... copy a section row + its menu panel, give them new
+  --                        ids, then add the ids to SECTION_HEADERS in main.lua
+  --                        and write the onClick that toggles the panel.
+  --   * Colours .......... the hex values above; styleModMenu() in main.lua
+  --                        re-tints switches/sliders after load.
+  --
   LinearLayout,
   layout_width="match_parent",
   layout_height="match_parent",
@@ -52,7 +61,7 @@
     radius="22dp";
     layout_width="match_parent",
     layout_height="match_parent",
-    backgroundColor="0xFF1C1C1E"; -- iOS system background (was 0xFF000000)
+    backgroundColor="0xFF000000"; -- iOS dark base: black sheet, lighter cards
     CardElevation="0dp",           -- flat: iOS separates layers with colour, not shadow
     layout_gravity="center";
     id="menufloating";
@@ -61,7 +70,8 @@
       orientation="vertical";
       layout_width="match_parent";
       layout_height="match_parent";
-      gravity="center";
+      gravity="top";  -- NOT "center": centring pushed the list down and left a
+                       -- dead gap under the last section
       {
         -- Header bar. This whole row is the drag handle:
         -- main.lua -> fl.OnTouchListener() moves the window while you drag it.
@@ -121,38 +131,6 @@
             padding="4dp";
             id="t1";
           };
-        };
-      };
-
-{
-        -- One compact status strip. This REPLACES the two stacked banner rows
-        -- ("• SECURE VIP" and "PRIVATE BUILD • PREMIUM ACCESS • ONLINE") which
-        -- used to waste ~36dp of height. Duplicate this block if you need more
-        -- status lines - but remember every extra row makes the menu taller.
-        LinearLayout;
-        layout_width="match_parent";
-        layout_height="wrap";
-        orientation="horizontal";
-        gravity="center_vertical";
-        backgroundColor="0xFF1C1C1E";
-        padding="6dp";
-        {
-          TextView;
-          text="● SECURE VIP";
-          textColor="0xFF64D2FF";
-          textSize="8sp";
-          layout_width="0dp";
-          layout_weight="1"; -- pushes the right-hand label to the far edge
-          layout_height="wrap";
-        };
-        {
-          TextView;
-          text="PRIVATE BUILD • PREMIUM • ONLINE";
-          textColor="0xFF8E8E93";
-          textSize="8sp";
-          gravity="right";
-          layout_width="wrap";
-          layout_height="wrap";
         };
       };
 
@@ -218,41 +196,45 @@
                       };
 
                       {
-                        -- 1dp hairline separator above a section row (iOS list).
+                        -- 1dp hairline separator, inset to line up with the
+                        -- label text (exactly how iOS draws them).
                         TextView;
                         text="";
                         layout_width="match_parent";
                         layout_height="1dp";
                         backgroundColor="0xFF38383A";
+                        layout_marginLeft="16dp";
                       };
                       {
-
+                        -- iOS grouped-list section header: small grey label on the left,
+                        -- disclosure chevron on the RIGHT (that is where iOS puts it).
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="46dp";
+                        layout_height="40dp";
                         layout_width="match_parent";
+                        gravity="center_vertical";
+                        paddingLeft="16dp";
+                        paddingRight="14dp";
                         id="espmenu";
                         {
-                          ImageView;
-                          layout_width="20dp";
-                          layout_height="20dp";
-                          src="icon/ic_to_bottom.png";
-                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
-                          layout_gravity="center";
-                          padding="4dp";
-                          id="espicon";
+                          TextView;
+                          text="ANTI-BAN MENU";
+                          textColor="0xFF8E8E93"; -- iOS secondary label (not bold white)
+                          textSize="12sp";
+                          id="";
+                          layout_width="0dp";
+                          layout_weight="1";  -- fills what the chevron leaves
+                          layout_height="wrap";
+                          layout_gravity="center_vertical";
                         };
                         {
-                          TextView;
-                          text=toSmallCaps("ANTI-BAN MENU");
-                          textColor="0xFFE5E5EA";
-                          id="";
-                          textSize = "13sp";
-                          layout_gravity = "left|center_vertical";
-                          gravity = "left|center_vertical";
-                          paddingLeft = "12dp";
-                          layout_width = "match_parent";
-                          layout_height = "wrap";
+                          ImageView;
+                          layout_width="18dp";
+                          layout_height="18dp";
+                          src="icon/ic_to_bottom.png";
+                          colorFilter="0xFF636366"; -- iOS tertiary label
+                          layout_gravity="center_vertical";
+                          id="espicon";  -- main.lua swaps this icon when the section opens
                         };
                       };
                       {
@@ -261,8 +243,11 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu1";
-                        paddingLeft="8dp";
-                        paddingRight="8dp";
+                        -- iOS grouped list: the expanded options sit on a lighter
+                        -- card (#1C1C1E) against the black sheet, with a 16dp inset.
+                        backgroundColor="0xFF1C1C1E";
+                        paddingLeft="16dp";
+                        paddingRight="16dp";
                         visibility="gone";
                         {
                           ScrollView;
@@ -281,7 +266,7 @@
                               text=toSmallCaps("BYPASS LOGO [ ON GARENA ]");
                               textColor="0xFFE5E5EA";
                               id="logo";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="center";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -291,7 +276,7 @@
                               text=toSmallCaps("HOLD REPORT [ ON LOBBY ]");
                               textColor="0xFFE5E5EA";
                               id="anti1";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="center";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -301,7 +286,7 @@
                               text=toSmallCaps("SKIP TUTORIAL [ ON TIMI ]");
                               textColor="0xFFE5E5EA";
                               id="skip";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="center";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -311,7 +296,7 @@
                               text="   cʟᴇᴀʀ ʟᴏɢꜱ [ ᴀꜰᴛᴇʀɢᴀᴍᴇ ]";
                               textColor="0xFFE5E5EA";
                               id="clogs";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="center";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -339,41 +324,45 @@
                       };
 
                       {
-                        -- 1dp hairline separator above a section row (iOS list).
+                        -- 1dp hairline separator, inset to line up with the
+                        -- label text (exactly how iOS draws them).
                         TextView;
                         text="";
                         layout_width="match_parent";
                         layout_height="1dp";
                         backgroundColor="0xFF38383A";
+                        layout_marginLeft="16dp";
                       };
                       {
-
+                        -- iOS grouped-list section header: small grey label on the left,
+                        -- disclosure chevron on the RIGHT (that is where iOS puts it).
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="46dp";
+                        layout_height="40dp";
                         layout_width="match_parent";
+                        gravity="center_vertical";
+                        paddingLeft="16dp";
+                        paddingRight="14dp";
                         id="fpsmenu";
                         {
-                          ImageView;
-                          layout_width="20dp";
-                          layout_height="20dp";
-                          src="icon/ic_to_bottom.png";
-                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
-                          layout_gravity="center";
-                          padding="4dp";
-                          id="fpsicon";
+                          TextView;
+                          text="GRAPHICS & FRAME RATES";
+                          textColor="0xFF8E8E93"; -- iOS secondary label (not bold white)
+                          textSize="12sp";
+                          id="";
+                          layout_width="0dp";
+                          layout_weight="1";  -- fills what the chevron leaves
+                          layout_height="wrap";
+                          layout_gravity="center_vertical";
                         };
                         {
-                          TextView;
-                          text=toSmallCaps("GRAPHICS & FRAME RATES");
-                          textColor="0xFFE5E5EA";
-                          id="";
-                          textSize = "13sp";
-                          layout_gravity = "left|center_vertical";
-                          gravity = "left|center_vertical";
-                          paddingLeft = "12dp";
-                          layout_width = "match_parent";
-                          layout_height = "wrap";
+                          ImageView;
+                          layout_width="18dp";
+                          layout_height="18dp";
+                          src="icon/ic_to_bottom.png";
+                          colorFilter="0xFF636366"; -- iOS tertiary label
+                          layout_gravity="center_vertical";
+                          id="fpsicon";  -- main.lua swaps this icon when the section opens
                         };
                       };
                       {
@@ -382,8 +371,11 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu4";
-                        paddingLeft="8dp";
-                        paddingRight="8dp";
+                        -- iOS grouped list: the expanded options sit on a lighter
+                        -- card (#1C1C1E) against the black sheet, with a 16dp inset.
+                        backgroundColor="0xFF1C1C1E";
+                        paddingLeft="16dp";
+                        paddingRight="16dp";
                         visibility="gone";
                         {
                           ScrollView;
@@ -402,7 +394,7 @@
                               text="180 ғᴘs";
                               textColor="0xFFE5E5EA";
                               id="fps180";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="center";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -414,7 +406,7 @@
                               text="ᴍᴀx ғᴘs";
                               textColor="0xFFE5E5EA";
                               id="unlockfps";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="center";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -424,7 +416,7 @@
                               text=toSmallCaps("ᴍᴀx ғʀᴀᴍᴇʀᴀᴛᴇ");
                               textColor="0xFFE5E5EA";
                               id="fps";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="center";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -436,40 +428,45 @@
                       };
 
                       {
-                        -- 1dp hairline separator above a section row (iOS list).
+                        -- 1dp hairline separator, inset to line up with the
+                        -- label text (exactly how iOS draws them).
                         TextView;
                         text="";
                         layout_width="match_parent";
                         layout_height="1dp";
                         backgroundColor="0xFF38383A";
+                        layout_marginLeft="16dp";
                       };
                       {
+                        -- iOS grouped-list section header: small grey label on the left,
+                        -- disclosure chevron on the RIGHT (that is where iOS puts it).
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="46dp";
+                        layout_height="40dp";
                         layout_width="match_parent";
+                        gravity="center_vertical";
+                        paddingLeft="16dp";
+                        paddingRight="14dp";
                         id="aimmenu";
                         {
-                          ImageView;
-                          layout_width="20dp";
-                          layout_height="20dp";
-                          src="icon/ic_to_bottom.png";
-                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
-                          layout_gravity="center";
-                          padding="4dp";
-                          id="aimicon";
+                          TextView;
+                          text="ADJUSTABLE MENU";
+                          textColor="0xFF8E8E93"; -- iOS secondary label (not bold white)
+                          textSize="12sp";
+                          id="";
+                          layout_width="0dp";
+                          layout_weight="1";  -- fills what the chevron leaves
+                          layout_height="wrap";
+                          layout_gravity="center_vertical";
                         };
                         {
-                          TextView;
-                          text=toSmallCaps("ADJUSTABLE MENU");
-                          textColor="0xFFE5E5EA";
-                          id="";
-                          textSize = "13sp";
-                          layout_gravity = "left|center_vertical";
-                          gravity = "left|center_vertical";
-                          paddingLeft = "12dp";
-                          layout_width = "match_parent";
-                          layout_height = "wrap";
+                          ImageView;
+                          layout_width="18dp";
+                          layout_height="18dp";
+                          src="icon/ic_to_bottom.png";
+                          colorFilter="0xFF636366"; -- iOS tertiary label
+                          layout_gravity="center_vertical";
+                          id="aimicon";  -- main.lua swaps this icon when the section opens
                         };
                       };
 
@@ -479,8 +476,11 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu2";
-                        paddingLeft="8dp";
-                        paddingRight="8dp";
+                        -- iOS grouped list: the expanded options sit on a lighter
+                        -- card (#1C1C1E) against the black sheet, with a 16dp inset.
+                        backgroundColor="0xFF1C1C1E";
+                        paddingLeft="16dp";
+                        paddingRight="16dp";
                         visibility="gone";
                         {
                           ScrollView;
@@ -503,7 +503,7 @@
                                 text=toSmallCaps("ᴀɪᴍʙᴏᴛ");
                                 textColor="0xFFFF9F0A";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -514,7 +514,7 @@
                                 TextView;
                                 text="   ᴀɪᴍʙᴏᴛ (0%)";
                                 textColor="0xFFE5E5EA";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                                 layout_gravity="center";
@@ -533,7 +533,7 @@
                                 text=toSmallCaps("ꜰᴏᴠ 3ʀᴅ");
                                 textColor="0xFFFF9F0A";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -544,7 +544,7 @@
                                 TextView;
                                 text="  ꜰᴏᴠ 3ʀᴅ ᴀᴅᴊᴜꜱᴛᴀʙʟᴇ (0%)";
                                 textColor="0xFFE5E5EA";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                                 layout_gravity="center";
@@ -563,7 +563,7 @@
                                 text=toSmallCaps("sɴᴏᴡʙᴏᴀʀᴅ");
                                 textColor="0xFFFF9F0A";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -574,7 +574,7 @@
                                 TextView;
                                 text="  sɴᴏᴡʙᴏᴀʀᴅsᴘᴇᴇᴅ (0%)";
                                 textColor="0xFFE5E5EA";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                                 layout_gravity="center";
@@ -594,40 +594,45 @@
                         }
                       },
                       {
-                        -- 1dp hairline separator above a section row (iOS list).
+                        -- 1dp hairline separator, inset to line up with the
+                        -- label text (exactly how iOS draws them).
                         TextView;
                         text="";
                         layout_width="match_parent";
                         layout_height="1dp";
                         backgroundColor="0xFF38383A";
+                        layout_marginLeft="16dp";
                       };
                       {
+                        -- iOS grouped-list section header: small grey label on the left,
+                        -- disclosure chevron on the RIGHT (that is where iOS puts it).
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="46dp";
+                        layout_height="40dp";
                         layout_width="match_parent";
+                        gravity="center_vertical";
+                        paddingLeft="16dp";
+                        paddingRight="14dp";
                         id="othermenu";
                         {
-                          ImageView;
-                          layout_width="20dp";
-                          layout_height="20dp";
-                          src="icon/ic_to_bottom.png";
-                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
-                          layout_gravity="center";
-                          padding="4dp";
-                          id="othericon";
+                          TextView;
+                          text="BATTLE ROYALE & MEMORY HACKS";
+                          textColor="0xFF8E8E93"; -- iOS secondary label (not bold white)
+                          textSize="12sp";
+                          id="";
+                          layout_width="0dp";
+                          layout_weight="1";  -- fills what the chevron leaves
+                          layout_height="wrap";
+                          layout_gravity="center_vertical";
                         };
                         {
-
-                          TextView;
-                          text =toSmallCaps("Battle Royale & ᴍᴇᴍᴏʀʏ ʜᴀᴄᴋs");
-                          textColor = "0xFFE5E5EA";
-                          textSize = "13sp";
-                          layout_gravity = "left|center_vertical";
-                          gravity = "left|center_vertical";
-                          paddingLeft = "12dp";
-                          layout_width = "match_parent";
-                          layout_height = "wrap";
+                          ImageView;
+                          layout_width="18dp";
+                          layout_height="18dp";
+                          src="icon/ic_to_bottom.png";
+                          colorFilter="0xFF636366"; -- iOS tertiary label
+                          layout_gravity="center_vertical";
+                          id="othericon";  -- main.lua swaps this icon when the section opens
                         };
                       };
                       {
@@ -636,8 +641,11 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu3";
-                        paddingLeft="8dp";
-                        paddingRight="8dp";
+                        -- iOS grouped list: the expanded options sit on a lighter
+                        -- card (#1C1C1E) against the black sheet, with a 16dp inset.
+                        backgroundColor="0xFF1C1C1E";
+                        paddingLeft="16dp";
+                        paddingRight="16dp";
                         visibility="gone";
                         {
                           ScrollView;
@@ -661,7 +669,7 @@
                                 text="ʜᴀᴄᴋs";
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -675,7 +683,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="strong";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -686,7 +694,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="chams";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -696,7 +704,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="redhack";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -707,7 +715,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="mp";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -718,7 +726,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="who";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
 
@@ -729,7 +737,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="hit";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -739,7 +747,7 @@
                                 text =toSmallCaps("ʙʟᴜᴇᴘʀɪɴᴛ [ Unlock ᴀʟʟsᴋɪɴ ]"),
                                 textColor = "0xFFE5E5EA",
                                 id = "Blueprint",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width="match_parent",
                                 layout_height = "wrap"
@@ -750,7 +758,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="Scope";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
 
@@ -762,7 +770,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="fastsw";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -772,7 +780,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="speed";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -782,7 +790,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="spread";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -792,7 +800,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="noreload";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -802,7 +810,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="norecoil";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -812,7 +820,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="shake";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -822,7 +830,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="Delaysprintfire";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -832,7 +840,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="nsmoke";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -842,7 +850,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="nocrouch";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -851,7 +859,7 @@
                                 text=toSmallCaps("BATTLE ROYALE");
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -865,7 +873,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="pump";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -875,7 +883,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="Battle";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -885,7 +893,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="Walk";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
                               };
@@ -895,7 +903,7 @@
                                 textColor="0xFFE5E5EA";
                                 id="nop";
                                 layout_gravity="center";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width="match_parent";
                                 layout_height="wrap";
 
@@ -907,41 +915,45 @@
 
 
                       {
-                        -- 1dp hairline separator above a section row (iOS list).
+                        -- 1dp hairline separator, inset to line up with the
+                        -- label text (exactly how iOS draws them).
                         TextView;
                         text="";
                         layout_width="match_parent";
                         layout_height="1dp";
                         backgroundColor="0xFF38383A";
+                        layout_marginLeft="16dp";
                       };
                       {
-
+                        -- iOS grouped-list section header: small grey label on the left,
+                        -- disclosure chevron on the RIGHT (that is where iOS puts it).
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="46dp";
+                        layout_height="40dp";
                         layout_width="match_parent";
+                        gravity="center_vertical";
+                        paddingLeft="16dp";
+                        paddingRight="14dp";
                         id="brmenu";
                         {
-                          ImageView;
-                          layout_width="20dp";
-                          layout_height="20dp";
-                          src="icon/ic_to_bottom.png";
-                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
-                          layout_gravity="center";
-                          padding="4dp";
-                          id="bricon";
+                          TextView;
+                          text="SAFE MODE FEATURES";
+                          textColor="0xFF8E8E93"; -- iOS secondary label (not bold white)
+                          textSize="12sp";
+                          id="";
+                          layout_width="0dp";
+                          layout_weight="1";  -- fills what the chevron leaves
+                          layout_height="wrap";
+                          layout_gravity="center_vertical";
                         };
                         {
-                          TextView;
-                          text=toSmallCaps("SAFE MODE FEATURES");
-                          textColor="0xFFE5E5EA";
-                          id="";
-                          textSize = "13sp";
-                          layout_gravity = "left|center_vertical";
-                          gravity = "left|center_vertical";
-                          paddingLeft = "12dp";
-                          layout_width = "match_parent";
-                          layout_height = "wrap";
+                          ImageView;
+                          layout_width="18dp";
+                          layout_height="18dp";
+                          src="icon/ic_to_bottom.png";
+                          colorFilter="0xFF636366"; -- iOS tertiary label
+                          layout_gravity="center_vertical";
+                          id="bricon";  -- main.lua swaps this icon when the section opens
                         };
                       };
                       {
@@ -950,8 +962,11 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu5";
-                        paddingLeft="8dp";
-                        paddingRight="8dp";
+                        -- iOS grouped list: the expanded options sit on a lighter
+                        -- card (#1C1C1E) against the black sheet, with a 16dp inset.
+                        backgroundColor="0xFF1C1C1E";
+                        paddingLeft="16dp";
+                        paddingRight="16dp";
                         visibility="gone";
                         {
                           ScrollView;
@@ -977,7 +992,7 @@
                               text=toSmallCaps("Safe Mode");
                               textColor="0xFF64D2FF";
                               id="";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_gravity="left|center_vertical";
                               layout_width="match_parent";
                               layout_height="wrap";
@@ -991,7 +1006,7 @@
                               textColor="0xFFE5E5EA";
                               id="safe";
                               layout_gravity="center";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_width="match_parent";
                               layout_height="wrap";
                             };
@@ -1001,7 +1016,7 @@
                               textColor="0xFFE5E5EA";
                               id="safee";
                               layout_gravity="center";
-                              textSize = "12sp";
+                              textSize = "13sp";
                               layout_width="match_parent";
                               layout_height="wrap";
                             };
@@ -1011,40 +1026,45 @@
 
 
                       {
-                        -- 1dp hairline separator above a section row (iOS list).
+                        -- 1dp hairline separator, inset to line up with the
+                        -- label text (exactly how iOS draws them).
                         TextView;
                         text="";
                         layout_width="match_parent";
                         layout_height="1dp";
                         backgroundColor="0xFF38383A";
+                        layout_marginLeft="16dp";
                       };
                       {
+                        -- iOS grouped-list section header: small grey label on the left,
+                        -- disclosure chevron on the RIGHT (that is where iOS puts it).
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="46dp";
+                        layout_height="40dp";
                         layout_width="match_parent";
+                        gravity="center_vertical";
+                        paddingLeft="16dp";
+                        paddingRight="14dp";
                         id="skinmenu";
                         {
-                          ImageView;
-                          layout_width="20dp";
-                          layout_height="20dp";
-                          src="icon/ic_to_bottom.png";
-                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
-                          layout_gravity="center";
-                          padding="4dp";
-                          id="skinicon";
+                          TextView;
+                          text="SKIN HACK FEATURES";
+                          textColor="0xFF8E8E93"; -- iOS secondary label (not bold white)
+                          textSize="12sp";
+                          id="";
+                          layout_width="0dp";
+                          layout_weight="1";  -- fills what the chevron leaves
+                          layout_height="wrap";
+                          layout_gravity="center_vertical";
                         };
                         {
-                          TextView;
-                          text=toSmallCaps("SKIN HACK FEATURES");
-                          textColor="0xFFE5E5EA";
-                          id="";
-                          textSize = "13sp";
-                          layout_gravity = "left|center_vertical";
-                          gravity = "left|center_vertical";
-                          paddingLeft = "12dp";
-                          layout_width = "match_parent";
-                          layout_height = "wrap";
+                          ImageView;
+                          layout_width="18dp";
+                          layout_height="18dp";
+                          src="icon/ic_to_bottom.png";
+                          colorFilter="0xFF636366"; -- iOS tertiary label
+                          layout_gravity="center_vertical";
+                          id="skinicon";  -- main.lua swaps this icon when the section opens
                         };
                       };
                       {
@@ -1053,8 +1073,11 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu6";
-                        paddingLeft="8dp";
-                        paddingRight="8dp";
+                        -- iOS grouped list: the expanded options sit on a lighter
+                        -- card (#1C1C1E) against the black sheet, with a 16dp inset.
+                        backgroundColor="0xFF1C1C1E";
+                        paddingLeft="16dp";
+                        paddingRight="16dp";
                         visibility="gone";
                         {
                           ScrollView;
@@ -1081,7 +1104,7 @@
                                 text=" ᴍʏᴛʜɪᴄ ᴄʜᴀʀᴀᴄᴛᴇʀ";
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1093,7 +1116,7 @@
                                 text = "ᴅᴀʀᴋsʜᴇᴘʜᴇʀᴅ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "shepherd",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1103,7 +1126,7 @@
                                 text = "ᴋᴜɪᴊɪ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "kuiji",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1114,7 +1137,7 @@
                                 text = "sᴏᴘʜɪᴀ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "sophia",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1125,7 +1148,7 @@
                                 text = "sᴘᴇᴄᴛʀᴇ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "spectre",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1136,7 +1159,7 @@
                                 text = "ᴛᴇᴍᴘʟᴀʀ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "templar",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1147,7 +1170,7 @@
                                 text = "sɪʀᴇɴ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "siren",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1158,7 +1181,7 @@
                                 text = "ɢʜᴏsᴛ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "ghost",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1169,7 +1192,7 @@
                                 text = "ʟᴀᴢᴀʀᴜs ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "lazarus",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1180,7 +1203,7 @@
                                 text="sᴛʀᴇᴇᴛ ғɪɢʜᴛᴇʀ sᴋɪɴ";
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1193,7 +1216,7 @@
                                 text = "ᴄʜᴜɴʟɪ sᴛʀᴇᴇᴛ ғɪɢʜᴛᴇʀ",
                                 textColor = "0xFFFFD60A",
                                 id = "chunli",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1204,7 +1227,7 @@
                                 text = "ʀʏᴜ sᴛʀᴇᴇᴛ ғɪɢʜᴛᴇʀ",
                                 textColor = "0xFFFFD60A",
                                 id = "ryu",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1215,7 +1238,7 @@
                                 text = "ᴄᴀᴍᴍʏ sᴛʀᴇᴇᴛ ғɪɢʜᴛᴇʀ",
                                 textColor = "0xFFFFD60A",
                                 id = "cammy",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1226,7 +1249,7 @@
                                 text = "ᴀᴋᴜᴍᴀ sᴛʀᴇᴇᴛ ғɪɢʜᴛᴇʀ",
                                 textColor = "0xFFFFD60A",
                                 id = "akuma",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1237,7 +1260,7 @@
                                 text="ᴛʜᴇ ʙᴏʏs";
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1249,7 +1272,7 @@
                                 text = "𝙷𝙾𝙼𝙴𝙻𝙰𝙽𝙳𝙴𝚁",
                                 textColor = "0xFFBF5AF2",
                                 id = "homelander",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1259,7 +1282,7 @@
                                 text = "𝚂𝚃𝙰𝚁𝙻𝙸𝙶𝙷𝚃",
                                 textColor = "0xFFBF5AF2",
                                 id = "starlight",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1269,7 +1292,7 @@
                                 text = "𝙱𝙻𝙰𝙲𝙺𝙽𝙾𝙸𝚁",
                                 textColor = "0xFFBF5AF2",
                                 id = "blacknoir",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1280,7 +1303,7 @@
                                 text = toSmallCaps("Character Epic Skin"),
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1292,7 +1315,7 @@
                                 text = toSmallCaps("Black Vivian"),
                                 textColor = "0xFFBF5AF2",
                                 id = "vivian",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1302,7 +1325,7 @@
                                 text = toSmallCaps("Holy Pader"),
                                 textColor = "0xFFBF5AF2",
                                 id = "pader",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1312,7 +1335,7 @@
                                 text = toSmallCaps("Nikto"),
                                 textColor = "0xFFBF5AF2",
                                 id = "nikto",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1322,7 +1345,7 @@
                                 text="ᴍʏᴛʜɪᴄ ɢᴜɴ sᴋɪɴs";
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1335,7 +1358,7 @@
                                 text = toSmallCaps("Ak117 Lava Remix"),
                                 textColor = "0xFFFF453A",
                                 id = "ak117lava",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1346,7 +1369,7 @@
                                 text = toSmallCaps("Ak117 Memento"),
                                 textColor = "0xFFFF453A",
                                 id = "ak117",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1357,7 +1380,7 @@
                                 text = toSmallCaps("Bp50 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "bp50",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1368,7 +1391,7 @@
                                 text = toSmallCaps("Ffar Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "ffar",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1379,7 +1402,7 @@
                                 text = toSmallCaps("Grau Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "grau",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1390,7 +1413,7 @@
                                 text = toSmallCaps("Krig6 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "krig6",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1401,7 +1424,7 @@
                                 text = toSmallCaps("Type19 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "type19",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1412,7 +1435,7 @@
                                 text = toSmallCaps("Oden Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "oden",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1423,7 +1446,7 @@
                                 text = toSmallCaps("Xm4 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "xm4",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1434,7 +1457,7 @@
                                 text = toSmallCaps("Ak47 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "ak47",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1445,7 +1468,7 @@
                                 text = toSmallCaps("Tundra Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "lw3",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1456,7 +1479,7 @@
                                 text = toSmallCaps("Dlq Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "dlq33",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1467,7 +1490,7 @@
                                 text = toSmallCaps("Vmp Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "vmp",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1478,7 +1501,7 @@
                                 text = toSmallCaps("Uss9 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "uss9",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1489,7 +1512,7 @@
                                 text = toSmallCaps("Kilo Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "kilo",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1500,7 +1523,7 @@
                                 text = toSmallCaps("Switchblade Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "switchh",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1511,7 +1534,7 @@
                                 text = toSmallCaps("Jak12 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "jak12",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1522,7 +1545,7 @@
                                 text = toSmallCaps("Cx9 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "cx9",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1533,7 +1556,7 @@
                                 text = toSmallCaps("Qq9 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "qq9",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1544,7 +1567,7 @@
                                 text = toSmallCaps("Mg42 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "mg42",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1555,7 +1578,7 @@
                                 text = toSmallCaps("M13 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "m13",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1566,7 +1589,7 @@
                                 text = toSmallCaps("Fennec Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "fennec",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1577,7 +1600,7 @@
                                 text = toSmallCaps("Rytec Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "rytec",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1588,7 +1611,7 @@
                                 text = toSmallCaps("Holger Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "holger",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1599,7 +1622,7 @@
                                 text = toSmallCaps("Em2 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "em2",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1610,7 +1633,7 @@
                                 text = toSmallCaps("Cbr Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "cbr",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1621,7 +1644,7 @@
                                 text = toSmallCaps("Asval Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "asval",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1632,7 +1655,7 @@
                                 text = toSmallCaps("Peacekeeper Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "peace",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1643,7 +1666,7 @@
                                 text = toSmallCaps("Ram7 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "ram7",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1654,7 +1677,7 @@
                                 text = toSmallCaps("Type25 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "type25",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1665,7 +1688,7 @@
                                 text = toSmallCaps("So14 Mythic"),
                                 textColor = "0xFFFF453A",
                                 id = "so14",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1675,7 +1698,7 @@
                                 text = "ʟᴀᴄʜᴍᴀɴ ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "lachmann",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1686,7 +1709,7 @@
                                 text = "ᴅᴘ27 ᴍʏᴛʜɪᴄ",
                                 textColor = "0xFFFF453A",
                                 id = "dp27",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1698,7 +1721,7 @@
                                 text="ʟᴇɢᴇɴᴅᴀʀʏ ɢᴜɴ";
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1711,7 +1734,7 @@
                                 text = "ᴋʀᴍ ɢʟᴏʀɪᴏᴜs ʙʟᴀᴢᴇ",
                                 textColor = "0xFFFFD60A",
                                 id = "krm",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1722,7 +1745,7 @@
                                 text = "ᴋʀᴍ ʀᴇᴅ ғɪssᴜʀᴇ",
                                 textColor = "0xFFFFD60A",
                                 id = "krmred",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1733,7 +1756,7 @@
                                 text = "ᴋʀᴍ ʟᴏᴀᴅᴇᴅ ɢʟɪᴛᴄʜ",
                                 textColor = "0xFFFFD60A",
                                 id = "krmload",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1744,7 +1767,7 @@
                                 text = "ʟᴏᴄᴜs ᴇʟᴇᴄᴛʀᴏɴ",
                                 textColor = "0xFFFFD60A",
                                 id = "locus",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1755,7 +1778,7 @@
                                 text = "ʟᴏᴄᴜs ᴅᴇᴍᴏɴɪᴄ ʙʀᴇᴀᴛʜ",
                                 textColor = "0xFFFFD60A",
                                 id = "locusdemon",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1768,7 +1791,7 @@
                                 text = "ʙʏ15 ʙᴏʙᴀ ʙʟᴀsᴛᴇʀ",
                                 textColor = "0xFFFFD60A",
                                 id = "by15",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1779,7 +1802,7 @@
                                 text = "ʜs0405 ʟᴇɢᴇɴᴅᴀʀʏ",
                                 textColor = "0xFFFFD60A",
                                 id = "hssong",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1790,7 +1813,7 @@
                                 text = "ᴅʟǫ ʜᴏʟɪᴅᴀʏs",
                                 textColor = "0xFFFFD60A",
                                 id = "dlqholi",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1801,7 +1824,7 @@
                                 text = "ᴅʟǫ ᴢᴇᴀʟᴏᴛ",
                                 textColor = "0xFFFFD60A",
                                 id = "dlqzealot",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1812,7 +1835,7 @@
                                 text = toSmallCaps("Legendary Melee"),
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1825,7 +1848,7 @@
                                 text = toSmallCaps("Tang Knife"),
                                 textColor = "0xFFFFD60A",
                                 id = "tang",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1836,7 +1859,7 @@
                                 text = toSmallCaps("Longquan"),
                                 textColor = "0xFFFFD60A",
                                 id = "longq",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1846,7 +1869,7 @@
                                 text = toSmallCaps("Spear Azure"),
                                 textColor = "0xFFFFD60A",
                                 id = "spear",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1856,7 +1879,7 @@
                                 text = toSmallCaps("Beam scissors"),
                                 textColor = "0xFFFFD60A",
                                 id = "scissors",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1866,7 +1889,7 @@
                                 text = toSmallCaps("beam Tomahawk"),
                                 textColor = "0xFFFFD60A",
                                 id = "tomahawk",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1876,7 +1899,7 @@
                                 text = toSmallCaps("Beam Saber"),
                                 textColor = "0xFFFFD60A",
                                 id = "saber",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1886,7 +1909,7 @@
                                 text = toSmallCaps("Katana Fiery Blade"),
                                 textColor = "0xFFFFD60A",
                                 id = "fiery",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1896,7 +1919,7 @@
                                 text = "ᴇǫᴜɪᴘᴍᴇɴᴛ & ᴠᴇʜɪᴄʟᴇ",
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -1909,7 +1932,7 @@
                                 text = "ᴊᴇᴛᴘᴀᴄᴋ sᴏᴀʀɪɴɢ ʙʟᴀᴢᴇ",
                                 textColor = "0xFFFFD60A",
                                 id = "jetpack",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1919,7 +1942,7 @@
                                 text = "ᴘᴀʀᴀᴄʜᴜᴛᴇ ғᴀʀ ғʟɪɢʜᴛ",
                                 textColor = "0xFFFFD60A",
                                 id = "farflight",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -1929,7 +1952,7 @@
                                 text = "[ sɴᴏᴡʙᴏᴀʀᴅ ] sᴀɴᴅsᴛᴏʀᴍ",
                                 textColor = "0xFFFFD60A",
                                 id = "sand",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap",
@@ -1941,40 +1964,45 @@
 
 
                       {
-                        -- 1dp hairline separator above a section row (iOS list).
+                        -- 1dp hairline separator, inset to line up with the
+                        -- label text (exactly how iOS draws them).
                         TextView;
                         text="";
                         layout_width="match_parent";
                         layout_height="1dp";
                         backgroundColor="0xFF38383A";
+                        layout_marginLeft="16dp";
                       };
                       {
+                        -- iOS grouped-list section header: small grey label on the left,
+                        -- disclosure chevron on the RIGHT (that is where iOS puts it).
                         LinearLayout;
                         orientation="horizontal";
-                        layout_height="46dp";
+                        layout_height="40dp";
                         layout_width="match_parent";
+                        gravity="center_vertical";
+                        paddingLeft="16dp";
+                        paddingRight="14dp";
                         id="antennamenu";
                         {
-                          ImageView;
-                          layout_width="20dp";
-                          layout_height="20dp";
-                          src="icon/ic_to_bottom.png";
-                          colorFilter="0xFF8E8E93"; -- iOS secondary grey
-                          layout_gravity="center";
-                          padding="4dp";
-                          id="antennaicon";
+                          TextView;
+                          text="CAMO HACK MENU";
+                          textColor="0xFF8E8E93"; -- iOS secondary label (not bold white)
+                          textSize="12sp";
+                          id="";
+                          layout_width="0dp";
+                          layout_weight="1";  -- fills what the chevron leaves
+                          layout_height="wrap";
+                          layout_gravity="center_vertical";
                         };
                         {
-                          TextView;
-                          text=toSmallCaps("CAMO HACK MENU");
-                          textColor="0xFFE5E5EA";
-                          id="";
-                          textSize = "13sp";
-                          layout_gravity = "left|center_vertical";
-                          gravity = "left|center_vertical";
-                          paddingLeft = "12dp";
-                          layout_width = "match_parent";
-                          layout_height = "wrap";
+                          ImageView;
+                          layout_width="18dp";
+                          layout_height="18dp";
+                          src="icon/ic_to_bottom.png";
+                          colorFilter="0xFF636366"; -- iOS tertiary label
+                          layout_gravity="center_vertical";
+                          id="antennaicon";  -- main.lua swaps this icon when the section opens
                         };
                       };
                       {
@@ -1983,8 +2011,11 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu7";
-                        paddingLeft="8dp";
-                        paddingRight="8dp";
+                        -- iOS grouped list: the expanded options sit on a lighter
+                        -- card (#1C1C1E) against the black sheet, with a 16dp inset.
+                        backgroundColor="0xFF1C1C1E";
+                        paddingLeft="16dp";
+                        paddingRight="16dp";
                         visibility="gone";
                         {
                           ScrollView;
@@ -2008,7 +2039,7 @@
                                 text="ɴᴏᴛᴇ : ɪɴᴊᴇᴄᴛᴏʀ ᴛʜᴇ sᴋɪɴ ғɪʀsᴛ";
                                 textColor="0xFF64D2FF";
                                 id="";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_gravity="left|center_vertical";
                                 layout_width="match_parent";
                                 layout_height="wrap";
@@ -2021,7 +2052,7 @@
                                 text = "ᴏғғ ᴄᴀᴍᴏ",
                                 textColor = "0xFFE5E5EA",
                                 id = "offcamo",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -2031,7 +2062,7 @@
                                 text = "ᴅɪᴀᴍᴏɴᴅ ᴄᴀᴍᴏ",
                                 textColor = "0xFFE5E5EA",
                                 id = "diamond",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -2041,7 +2072,7 @@
                                 text = "ʀᴇᴅsᴘʀɪᴛᴇ ᴄᴀᴍᴏ",
                                 textColor = "0xFFE5E5EA",
                                 id = "redsprite",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -2051,7 +2082,7 @@
                                 text = "ᴇᴍᴇʀᴀʟᴅ ᴄᴀᴍᴏ",
                                 textColor = "0xFFE5E5EA",
                                 id = "emerald",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -2061,7 +2092,7 @@
                                 text = "ᴀssᴀᴜʟᴛ ᴄᴀᴍᴏ",
                                 textColor = "0xFFE5E5EA",
                                 id = "assault",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -2071,7 +2102,7 @@
                                 text = "sᴄᴏʀᴄʜ ᴄᴀᴍᴏ",
                                 textColor = "0xFFE5E5EA",
                                 id = "scorch",
-                                textSize = "12sp",
+                                textSize = "13sp",
                                 layout_gravity = "center",
                                 layout_width = "match_parent",
                                 layout_height = "wrap"
@@ -2085,7 +2116,7 @@
                                 textColor = "0xFFE5E5EA";
                                 backgroundColor = "0xFFFF2A2A";
                                 id = "closeui";
-                                textSize = "12sp";
+                                textSize = "13sp";
                                 layout_width = "match_parent";
                                 layout_height = "wrap";
                               };
@@ -2093,16 +2124,6 @@
                           };
                         };
                       };
-                      {
-                        TextView;
-                        text="KIRO  •  PRIVATE  •  PREMIUM";
-                        textColor="0xFF8E8E93";
-                        textSize="8sp";
-                        gravity="center";
-                        layout_width="match_parent";
-                        layout_height="26dp";
-                      };
-
 
                     };
                   };
