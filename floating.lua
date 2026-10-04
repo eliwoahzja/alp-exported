@@ -13,8 +13,16 @@
   --      0xFF30D158 green    0xFF64D2FF teal   0xFFFF453A red   0xFFFF9F0A orange
   --   3. Density: section headers 58dp -> 42dp, row text 15sp -> 12sp,
   --      section titles 13sp, list rows are now full width (bigger tap targets).
-  --   4. The bright green outer frame is gone (it made the menu look like a
-  --      neon box and wasted ~10dp on every side).
+--   4. The bright green outer frame is gone (it made the menu look like a
+--      neon box and wasted ~10dp on every side).
+--   5. FIX: all textStyle="bold" attributes were deleted. AndLua's layout loader
+--      has no setTextStyle(), so each one produced
+--        "TextView@setTextStyle is not a field or method"
+--      in the log and was then ignored (the titles were never bold). The section
+--      titles are now styled from Lua - see styleSectionHeaders() in main.lua.
+--      Also remember: a typo like "lyout_width" (missing 'a') is NOT a layout
+--      param, so AndLua tries setLyout_width() and logs
+--      "ImageView@setLayout_width is not a field or method".
   --
   -- IMPORTANT: every id= in this file is referenced by main.lua
   -- (onClick / OnCheckedChangeListener / seekbars). Renaming or deleting an id
@@ -79,7 +87,6 @@
                                     -- font made the title hard to read
                 textColor="0xFFE5E5EA";
                 textSize = "14sp";
-                textStyle="bold";
                 id="";
                 layout_gravity="left|center_vertical";
                 layout_width="wrap";
@@ -901,7 +908,6 @@
                           textColor="0xFFE5E5EA";
                           id="";
                           textSize = "13sp";
-                          textStyle = "bold";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
                           paddingLeft = "14dp";
@@ -998,7 +1004,6 @@
                           textColor="0xFFE5E5EA";
                           id="";
                           textSize = "13sp";
-                          textStyle = "bold";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
                           paddingLeft = "14dp";
@@ -1922,7 +1927,6 @@
                           textColor="0xFFE5E5EA";
                           id="";
                           textSize = "13sp";
-                          textStyle = "bold";
                           layout_gravity = "left|center_vertical";
                           gravity = "left|center_vertical";
                           paddingLeft = "14dp";

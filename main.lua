@@ -104,6 +104,85 @@ function dp(value)
   return math.floor(value * activity.getResources().getDisplayMetrics().density + 0.5)
 end
 
+-- =============================================================================
+-- OVERLAY PERMISSION  (fixes the crash in your log)
+-- -----------------------------------------------------------------------------
+-- ERROR YOU SAW:
+--   Runtime error: android.view.WindowManager$BadTokenException:
+--   Unable to add window ... permission denied for window type 2038
+--   at main.lua:107 in function 'createFloatingText'
+--
+-- WHAT IT MEANS
+--   Window type 2038 is TYPE_APPLICATION_OVERLAY (the modern "draw over other
+--   apps" window this whole menu is built on). Android only allows that window
+--   if the user granted the app the SYSTEM_ALERT_WINDOW permission. Without it
+--   wm.addView() throws and, because nothing caught it, the whole script died -
+--   which is why the screen went black.
+--
+-- THE FIX (2 parts)
+--   1. safeAddView() below wraps every addView in pcall, so a missing
+--      permission can no longer kill the app.
+--   2. On failure it opens Android's "Display over other apps" screen so the
+--      user can grant it, and explains what to tap.
+--
+-- STILL NEEDED ON YOUR SIDE (cannot be done from Lua)
+--   The permission must also be declared when you build the project:
+--   ALP Editor -> Project Settings -> Permissions -> add
+--   android.permission.SYSTEM_ALERT_WINDOW.
+--   A declared-but-not-granted permission is what this code detects at runtime.
+-- =============================================================================
+OVERLAY_SETTINGS_SHOWN = false  -- only auto-open the settings screen once
+
+-- True when we are allowed to draw over other apps.
+-- Only Android 8.0+ (API 26) is checked, because that is the only case where we
+-- use TYPE_APPLICATION_OVERLAY (window type 2038) - see createFloatingText().
+-- Older Android versions use TYPE_PHONE, where SYSTEM_ALERT_WINDOW was granted
+-- at install time, so requiring a runtime check there would block a working app.
+function hasOverlayPermission()
+  if Build.VERSION.SDK_INT < 26 then return true end
+  local ok, granted = pcall(function()
+    return android.provider.Settings.canDrawOverlays(activity)
+  end)
+  -- If the check itself is unavailable, do NOT block the app: behave like the
+  -- old code did and let addView() try.
+  if ok and granted ~= nil then return granted end
+  return true
+end
+
+-- Shows a short explanation and opens the exact settings page for this app.
+function explainOverlayPermission()
+  -- Toast.makeText is used instead of AndLua's toast() shorthand because this
+  -- file already relies on the Toast class elsewhere (see idkcstmToast).
+  pcall(function()
+    Toast.makeText(activity,
+      'Enable "Display over other apps" for this app, then open it again.',
+      Toast.LENGTH_LONG).show()
+  end)
+  if OVERLAY_SETTINGS_SHOWN then return end
+  OVERLAY_SETTINGS_SHOWN = true
+  pcall(function()
+    activity.startActivity(android.content.Intent(
+      android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,  -- API 23+
+      android.net.Uri.parse("package:" .. activity.getPackageName())))
+  end)
+end
+
+-- Replacement for wm.addView(view, params) that cannot crash the script.
+-- Returns true when the window was actually added.
+function safeAddView(wm, view, params)
+  if not hasOverlayPermission() then
+    explainOverlayPermission()
+    return false
+  end
+  local ok = pcall(function() wm.addView(view, params) end)
+  if not ok then
+    -- Still failed -> almost certainly the permission, so guide the user.
+    explainOverlayPermission()
+    return false
+  end
+  return true
+end
+
 activity.setTheme(R.AndLua1)
 activity.ActionBar.setTitle("Lets play!")
 activity.ActionBar.hide()
@@ -126,10 +205,22 @@ import "android.graphics.Color"
 function createFloatingText()
   local wm = activity.getSystemService(Context.WINDOW_SERVICE)
 
+  -- Window type depends on the Android version:
+  --   Android 8.0+ (API 26+) requires TYPE_APPLICATION_OVERLAY (2038).
+  --   Older versions do not have that constant, so use TYPE_PHONE instead.
+  -- The old code used TYPE_APPLICATION_OVERLAY unconditionally, which throws on
+  -- anything older than Android 8.
+  local overlayType
+  if Build.VERSION.SDK_INT >= 26 then
+    overlayType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+  else
+    overlayType = WindowManager.LayoutParams.TYPE_PHONE
+  end
+
   local params = WindowManager.LayoutParams(
   WindowManager.LayoutParams.WRAP_CONTENT,
   WindowManager.LayoutParams.WRAP_CONTENT,
-  WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+  overlayType,
   WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
   PixelFormat.TRANSLUCENT
   )
@@ -146,7 +237,10 @@ function createFloatingText()
 
   floatText.setShadowLayer(10, 0, 0, Color.RED)
 
-  wm.addView(floatText, params)
+  -- was: wm.addView(floatText, params)
+  -- This one line was the crash in your log. safeAddView keeps a missing
+  -- overlay permission from killing the app.
+  if not safeAddView(wm, floatText, params) then return end
 
 
   function startFloating(view)
@@ -320,9 +414,12 @@ end
 function Win_minWindow.onClick(v)
   Waterdropanimation(Win_minWindow,50)
   if OpenM==false then
-    OpenM=true
-    LayoutVIP.addView(mainWindow,A3params)
-    LayoutVIP1.removeView(minWindow)
+    -- safeAddView: if the overlay permission is missing we must NOT set OpenM=true,
+    -- otherwise the flag says "menu is open" while no window exists.
+    if safeAddView(LayoutVIP, mainWindow, A3params) then
+      OpenM=true
+      LayoutVIP1.removeView(minWindow)
+    end
   end
 end
 
@@ -330,7 +427,7 @@ function t1.onClick(v)
   if OpenM==true then
     OpenM=false
     LayoutVIP.removeView(mainWindow)
-    LayoutVIP1.addView(minWindow,A3params1)
+    safeAddView(LayoutVIP1, minWindow, A3params1)
   end
 end
 
@@ -365,8 +462,9 @@ enableImmersiveMode()
 function start.onClick()
   Waterdropanimation(start,20)
   if isMax==false then
-    isMax=true
-    LayoutVIP1.addView(minWindow,A3params1)
+    if safeAddView(LayoutVIP1, minWindow, A3params1) then
+      isMax=true
+    end
 
    else
   end
@@ -1564,6 +1662,35 @@ function styleModMenu()
   end)
 end
 
+-- The 7 collapsible section headers ("ANTI-BAN MENU", "FPS MENU", "AIMBOT MENU",
+-- ...). Their titles used to be marked with textStyle="bold" inside floating.lua,
+-- but AndLua has no setTextStyle() - the layout loader printed
+--   "TextView@setTextStyle is not a field or method"
+-- for every one of them and then dropped the attribute, so they were never bold.
+-- The weight is applied here instead.
+-- To style a header, change its id's text in floating.lua and re-run this.
+SECTION_HEADERS = { "espmenu", "fpsmenu", "aimmenu", "othermenu",
+                    "brmenu", "skinmenu", "antennamenu" }
+
+function styleSectionHeaders()
+  for _, headerName in ipairs(SECTION_HEADERS) do
+    local header = _G[headerName]           -- layout ids live in the global table
+    if header ~= nil then
+      local ok, count = pcall(function() return header.getChildCount() end)
+      if ok and count ~= nil then
+        for i = 0, count - 1 do
+          local child = header.getChildAt(i)
+          if child ~= nil and classNameOf(child) == "TextView" then
+            pcall(function() child.setTypeface(TF_BOLD) end)     -- bold
+            pcall(function() child.setLetterSpacing(0.02) end)   -- iOS tracking
+          end
+        end
+      end
+    end
+  end
+end
+
 -- Apply after every other handler is wired up (this is the last statement in the
 -- file on purpose): anything that tints a control earlier gets corrected here.
 pcall(styleModMenu)
+pcall(styleSectionHeaders)

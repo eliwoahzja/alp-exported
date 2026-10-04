@@ -13,6 +13,12 @@
   --   * Quick actions became a single "list" of 56dp rows (like iOS Settings)
   --     instead of four tall 62dp cards with big empty icon bubbles.
   --   * Padding/spacing now follows an 8dp grid (20dp screen margin, 8dp gaps).
+  --   * FIX: every textStyle="bold" was deleted. AndLua's layout loader has no
+  --     setTextStyle(), so it printed
+  --       "TextView@setTextStyle is not a field or method"
+  --     for each one and then ignored it - the text was never actually bold.
+  --     Bold is now applied from Lua: see applyTypography() in main.lua.
+  --     (Same reason letterSpacing cannot be used here either.)
   --
   -- HOW TO EDIT
   --   * Colours/sizes ... edit the values inline here; the tokens are documented
@@ -73,7 +79,6 @@
           text="KIRO PRIVATE";
           textColor="0xFFFFFFFF";
           textSize="28sp";
-          textStyle="bold";
           layout_width="wrap";
           layout_height="wrap";
           -- NOTE: letter spacing is applied from Lua (applyTypography in
@@ -214,7 +219,6 @@
             text="START";
             textColor="0xFF30D158";
             textSize="17sp";
-            textStyle="bold";
             layout_width="wrap";
             layout_height="wrap";
             layout_marginTop="10dp";
@@ -279,7 +283,6 @@
             text="STOP";
             textColor="0xFFFF453A";
             textSize="17sp";
-            textStyle="bold";
             layout_width="wrap";
             layout_height="wrap";
             layout_marginTop="10dp";
@@ -306,7 +309,6 @@
       text="QUICK ACTIONS";
       textColor="0xFF8E8E93"; -- iOS secondary label
       textSize="11sp";
-      textStyle="bold";
       layout_width="wrap";
       layout_height="wrap";
       layout_marginLeft="4dp";
