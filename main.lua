@@ -63,14 +63,56 @@ end
 
 
 
+-- =============================================================================
+-- UI DESIGN TOKENS  (new - everything visual is driven from here)
+-- -----------------------------------------------------------------------------
+-- The three layout files (layout.lua = launcher screen, floating.lua = in-game
+-- mod menu, icon.lua = minimised bubble) all use these colours so the app looks
+-- like one system. Change a value here *and* in the layout files, or better:
+-- keep using the same hex values as a "style guide".
+--
+--   Background (page) ......... 0xFF000000  pure black, iOS dark mode base
+--   Surface (cards) .......... 0xFF1C1C1E  iOS systemBackground dark
+--   Surface raised (headers) . 0xFF2C2C2E  iOS secondarySystemBackground
+--   Label (primary text) ..... 0xFFE5E5EA  iOS label
+--   Label (secondary) ........ 0xFF8E8E93  iOS secondaryLabel
+--   Label (tertiary) ......... 0xFF636366  iOS tertiaryLabel
+--   Separator ................. 0xFF38383A  iOS separator
+--   Accent green ............. 0xFF30D158  iOS systemGreen
+--   Accent blue .............. 0xFF0A84FF  iOS systemBlue
+--   Accent teal .............. 0xFF64D2FF  iOS systemTeal
+--   Accent red ............... 0xFFFF453A  iOS systemRed
+--   Accent orange ............ 0xFFFF9F0A  iOS systemOrange
+--   Accent purple ............ 0xFFBF5AF2  iOS systemPurple
+--
+--   Corner radius: 12dp small cards, 16dp big cards, 22dp the menu shell.
+--   Spacing unit: 8dp (4dp = half step, 16/20dp = section gaps).
+-- =============================================================================
+
+-- The floating menu used to size itself as a percentage of the screen
+-- ("85%w" of the display), which made it huge. It is now a fixed, smaller size.
+-- THESE TWO NUMBERS ARE THE ONLY THING YOU NEED TO EDIT to resize the menu.
+MENU_WIDTH_DP  = 300   -- was ~63% of the screen width. Try 260 (tighter) or 340.
+MENU_HEIGHT_DP = 520   -- was full screen height. Try 440 (shorter) or 640 (taller).
+
+-- Converts dp (device-independent pixels, the unit Android scales for you) into
+-- real pixels for the current screen. Layout files understand "34dp" directly,
+-- but WindowManager.LayoutParams only understands pixels - hence this helper.
+-- NOTE: we round by hand with math.floor instead of math.round, because
+-- math.round only exists in Lua 5.3+ and AndLua ships Lua 5.1/LuaJIT.
+function dp(value)
+  return math.floor(value * activity.getResources().getDisplayMetrics().density + 0.5)
+end
+
 activity.setTheme(R.AndLua1)
 activity.ActionBar.setTitle("Lets play!")
 activity.ActionBar.hide()
 activity.overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out)
-activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS).setStatusBarColor(0xFF202125);
+-- Status bar now matches the iOS-style near-black background instead of 0xFF202125.
+activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS).setStatusBarColor(0xFF000000);
 --activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 activity.ActionBar.setElevation(0)
-activity.ActionBar.setBackgroundDrawable(ColorDrawable(0xFF202125))
+activity.ActionBar.setBackgroundDrawable(ColorDrawable(0xFF1C1C1E))
 activity.setRequestedOrientation(1)
 activity.setContentView(loadlayout(layout))
 
@@ -148,15 +190,54 @@ end
 
 
 
+-- =============================================================================
+-- TYPOGRAPHY  (changed)
+-- -----------------------------------------------------------------------------
+-- The launcher buttons used to load font/zt2.ttf, a "small caps" display font.
+-- Small-caps unicode glyphs are hard to read at small sizes and are not what an
+-- iOS-style UI uses, so the buttons now use the platform's own system font.
+-- Weights come from the font family name:
+--   sans-serif-medium / sans-serif-black = iOS "semibold / bold" equivalent.
+-- letterSpacing adds the tiny tracking iOS puts on titles and section headers.
+--
+-- If you ever want the custom font back, uncomment the File()/createFromFile
+-- lines below and assign the resulting typeface instead of TF_MEDIUM.
+-- =============================================================================
 import "java.io.File"
 import "android.graphics.Typeface"
-local bf=File(activity.getLuaDir().."/font/zt2.ttf");
-local tf=Typeface.createFromFile(bf)
 
-strt.setTypeface(tf);
-stp.setTypeface(tf);
-strttxt.getPaint().setFakeBoldText(true)
-stptxt.getPaint().setFakeBoldText(true)
+-- iOS-like type scale (see the layout files for the matching textSize values).
+TF_MEDIUM = Typeface.create("sans-serif-medium", Typeface.NORMAL) -- titles, buttons
+TF_BOLD   = Typeface.create("sans-serif", Typeface.BOLD)            -- headings
+
+-- Optional custom font, currently unused:
+-- local bf = File(activity.getLuaDir().."/font/zt2.ttf")
+-- local tf = Typeface.createFromFile(bf)
+
+strt.setTypeface(TF_BOLD)   -- "START"
+stp.setTypeface(TF_BOLD)    -- "STOP"
+strttxt.getPaint().setFakeBoldText(false)  -- was true: subtitles looked shouty
+stptxt.getPaint().setFakeBoldText(false)
+
+-- applyTypography(view, typeface, letterSpacing, allCaps)
+-- Small helper so the rest of the UI stays consistent. Letter spacing needs
+-- Android 5.0+, so every call is wrapped in pcall to stay safe on old devices.
+function applyTypography(view, typeface, tracking, allCaps)
+  if view == nil then return end
+  if typeface ~= nil then pcall(function() view.setTypeface(typeface) end) end
+  if tracking ~= nil then pcall(function() view.setLetterSpacing(tracking) end) end
+  if allCaps ~= nil then pcall(function() view.setAllCaps(allCaps) end) end
+end
+
+-- Launcher screen: medium-weight labels, slight tracking on the big title.
+applyTypography(title, TF_BOLD, 0.01, false)
+applyTypography(statusText, TF_MEDIUM, 0.04, false)
+applyTypography(version, TF_MEDIUM, 0.04, false)
+applyTypography(gametxt, TF_MEDIUM, 0.0, false)
+applyTypography(tgTitle, TF_MEDIUM, 0.0, false)
+applyTypography(feedbackTitle, TF_MEDIUM, 0.0, false)
+applyTypography(footerTitle, TF_MEDIUM, 0.08, false)
+applyTypography(footerStatus, TF_MEDIUM, 0.02, false)
 
 
 
@@ -174,8 +255,12 @@ A3params.x = 0
 A3params.y = 0
 A3params.flags=WindowManager.LayoutParams().FLAG_NOT_FOCUSABLE
 A3params.gravity = Gravity.CENTER | Gravity.CENTER
-A3params.width = WindowManager.LayoutParams.WRAP_CONTENT
-A3params.height = WindowManager.LayoutParams.WRAP_CONTENT
+-- CHANGED: the menu now gets a FIXED, SMALLER size instead of WRAP_CONTENT.
+-- WRAP_CONTENT made floating.lua fill (almost) the whole screen, because its root
+-- views are layout_width/height="fill". dp() converts our dp numbers to pixels.
+-- Edit MENU_WIDTH_DP / MENU_HEIGHT_DP at the top of this file to resize it.
+A3params.width = dp(MENU_WIDTH_DP)
+A3params.height = dp(MENU_HEIGHT_DP)
 mainWindow = loadlayout(floating)
 isMax=false
 
@@ -1395,3 +1480,90 @@ local toastLayout = {
     },
   },
 }
+
+-- =============================================================================
+-- iOS STYLE PASS  (new - runs last so it overrides the older tints above)
+-- -----------------------------------------------------------------------------
+-- WHAT THIS DOES
+--   The mod menu is built from ~150 RadioButton/CheckBox/SeekBar widgets, each
+--   one tinted individually further up this file with a half-transparent WHITE
+--   filter (0x9AFFFFFF). That looked washed out next to the new iOS palette.
+--   Instead of editing 150 lines, this walks the whole view tree ONCE and
+--   re-tints every control with the iOS accent green.
+--
+-- HOW TO EDIT
+--   * Accent colour ....... change ACCENT below (iOS systemGreen = 0xFF30D158).
+--   * Want the old look? .. delete/comment out the styleModMenu() call at the
+--                           very bottom of this file.
+--   * Want another control? add another if/elseif branch in styleModMenu().
+-- =============================================================================
+
+ACCENT        = 0xFF30D158  -- iOS systemGreen: switch + slider colour
+ACCENT_SOFT   = 0xCC30D158  -- same green at 80% opacity (unselected controls)
+LABEL_COLOR   = 0xFFE5E5EA  -- iOS primary label
+
+-- Walks every view inside the floating menu, parents first.
+-- pcall is used because not every widget has the methods we ask for
+-- (e.g. a TextView has no getChildCount), and one error would stop the app.
+local function eachView(view, callback)
+  if view == nil then return end
+  callback(view)
+  local ok, count = pcall(function() return view.getChildCount() end)
+  if ok and count ~= nil then
+    for i = 0, count - 1 do
+      local okChild, child = pcall(function() return view.getChildAt(i) end)
+      if okChild and child ~= nil then eachView(child, callback) end
+    end
+  end
+end
+
+-- Returns the simple class name of a view ("CheckBox", "SeekBar", ...).
+local function classNameOf(view)
+  local ok, name = pcall(function() return view.getClass().getSimpleName() end)
+  if ok and name ~= nil then return name end
+  return ""
+end
+
+function styleModMenu()
+  eachView(mainWindow, function(view)
+    local class = classNameOf(view)
+
+    -- Switch-like widgets: tint the box/dot green (iOS uses tinted controls).
+    if class == "CheckBox" or class == "RadioButton"
+       or class == "SwitchCompat" or class == "Switch" then
+      pcall(function()
+        view.getButtonDrawable().setColorFilter(
+          PorterDuffColorFilter(ACCENT_SOFT, PorterDuff.Mode.SRC_ATOP))
+      end)
+      pcall(function() view.setTextColor(LABEL_COLOR) end)
+
+    -- Sliders (aimbot / fov / snowboard): green track, white knob - same as
+    -- an iOS UISlider. setProgressTintList needs Android 5.0+, hence pcall.
+    elseif class == "SeekBar" then
+      pcall(function()
+        local tintList = android.content.res.ColorStateList.valueOf(ACCENT)
+        view.setProgressTintList(tintList)
+      end)
+      pcall(function()
+        view.setProgressBackgroundTintList(
+          android.content.res.ColorStateList.valueOf(0xFF38383A))
+      end)
+
+    -- The Exit button inside the menu: iOS destructive red, pill shaped.
+    elseif class == "Button" then
+      pcall(function()
+        view.setTextColor(0xFFFFFFFF)
+        local bg = GradientDrawable()
+        bg.setShape(GradientDrawable.RECTANGLE)
+        bg.setCornerRadius(dp(10))
+        bg.setColor(0xFFFF453A) -- iOS systemRed
+        view.setBackgroundDrawable(bg)
+        view.setAllCaps(false) -- iOS sentence case, not ALL CAPS
+      end)
+    end
+  end)
+end
+
+-- Apply after every other handler is wired up (this is the last statement in the
+-- file on purpose): anything that tints a control earlier gets corrected here.
+pcall(styleModMenu)
