@@ -1,0 +1,972 @@
+#include <iostream>
+#include <vector>
+#include "MemoryTools.h"
+
+
+int main(int argc, char **argv) {
+    char packageName[] = "com.garena.game.codm";
+    char getRoot[100];
+    if (getuid() == 0) {
+        sprintf(getRoot, "MODE_ROOT");
+    } else {
+        sprintf(getRoot, "MODE_NO_ROOT");
+    }
+    killGG();
+    int Fitur = atoi(argv[1]);
+    initXMemoryTools(packageName, getRoot);
+    switch (Fitur) {
+    case 1000: // tang knife
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("6145", -16, TYPE_DWORD);
+    MemoryWrite("100424", 4, TYPE_DWORD);
+    MemoryWrite("10717001", 8, TYPE_DWORD);
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702201", TYPE_DWORD);
+    MemoryOffset("6145", -16, TYPE_DWORD);
+    MemoryWrite("100424", 4, TYPE_DWORD);
+    MemoryWrite("10717001", 8, TYPE_DWORD);
+    break;
+        case 999: // longquan
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("6145",  -0x10, TYPE_DWORD);
+    MemoryWrite("100897",  0x4, TYPE_DWORD);
+    MemoryWrite("10702670",  0x8, TYPE_DWORD);
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702201", TYPE_DWORD);
+    MemoryOffset("6145",  -0x10, TYPE_DWORD);
+    MemoryWrite("100897",  0x4, TYPE_DWORD);
+    MemoryWrite("10702670",  0x8, TYPE_DWORD);
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("851968",  -0x14, TYPE_DWORD);
+    MemoryWrite("0",  -0xC, TYPE_DWORD);
+    MemoryWrite("300234",  -0x8, TYPE_DWORD);
+    MemoryWrite("0",  -0x14, TYPE_DWORD);
+break;
+
+  
+ 
+
+case 1001: // Mythic | Kilo141 FallingAngel
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10124001", TYPE_DWORD);
+    MemoryOffset("38", -0x10, TYPE_DWORD);
+    MemoryWrite("100155", 0x4, TYPE_DWORD);
+    MemoryWrite("10124002", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10124201", TYPE_DWORD);
+    MemoryOffset("38", -0x10, TYPE_DWORD);
+    MemoryWrite("100155", 0x4, TYPE_DWORD);
+    MemoryWrite("10124002", 0x8, TYPE_DWORD);
+       
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10124001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("50", 0x4C, TYPE_DWORD);
+    MemoryOffset("30", 0x54, TYPE_DWORD);        
+    MemoryWrite("5", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("400006", 0x20, TYPE_DWORD);
+    MemoryWrite("200112", 0x24, TYPE_DWORD);
+    MemoryWrite("300105", 0x28, TYPE_DWORD);      
+    MemoryWrite("0", 0x2C, TYPE_DWORD); 
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+       
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10124001", TYPE_DWORD);
+    MemoryOffset("10123201", 0xA0, TYPE_DWORD);
+    MemoryWrite("9479", -0xC, TYPE_DWORD);
+       
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);   
+    MemoryOffset("0", 76, TYPE_DWORD);   
+    MemoryOffset("0", 84, TYPE_DWORD);   
+    MemoryOffset("0", 96, TYPE_DWORD);   
+    MemoryOffset("1", 100, TYPE_DWORD);   
+    MemoryOffset("0", 104, TYPE_DWORD);   
+    MemoryWrite("10124002", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);   
+    MemoryOffset("0", 76, TYPE_DWORD);   
+    MemoryOffset("0", 84, TYPE_DWORD);   
+    MemoryOffset("0", 96, TYPE_DWORD);   
+    MemoryOffset("1", 100, TYPE_DWORD);   
+    MemoryOffset("0", 104, TYPE_DWORD);   
+    MemoryWrite("10124002", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);   
+    MemoryOffset("0", 76, TYPE_DWORD);   
+    MemoryOffset("0", 84, TYPE_DWORD);   
+    MemoryOffset("0", 96, TYPE_DWORD);   
+    MemoryOffset("1", 100, TYPE_DWORD);   
+    MemoryOffset("0", 104, TYPE_DWORD);   
+    MemoryWrite("10124002", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+MemorySearch("10124001", TYPE_DWORD);   
+MemoryOffset("38", -0x10, TYPE_DWORD);   
+MemoryWrite("100155", 0x4, TYPE_DWORD);   
+MemoryWrite("10124002", 0x8, TYPE_DWORD);   
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10124201", TYPE_DWORD);   
+MemoryOffset("38", -0x10, TYPE_DWORD);   
+MemoryWrite("100155", 0x4, TYPE_DWORD);   
+MemoryWrite("10124002", 0x8, TYPE_DWORD);   
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10124001", TYPE_DWORD);   
+MemoryOffset("1880000001", 0x14, TYPE_DWORD);   
+MemoryOffset("50", 0x4C, TYPE_DWORD);   
+MemoryOffset("30", 0x54, TYPE_DWORD);   
+MemoryWrite("5", 0x8, TYPE_DWORD);   
+MemoryWrite("0", 0x1C, TYPE_DWORD);   
+MemoryWrite("400006", 0x20, TYPE_DWORD);   
+MemoryWrite("200112", 0x24, TYPE_DWORD);   
+MemoryWrite("500037", 0x28, TYPE_DWORD);   
+MemoryWrite("0", 0x2C, TYPE_DWORD);   
+MemoryWrite("0", 0x30, TYPE_DWORD);   
+MemoryWrite("0", 0x34, TYPE_DWORD);   
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10124001", TYPE_DWORD);   
+MemoryOffset("10123201", 0xA0, TYPE_DWORD);   
+MemoryWrite("9479", -0xC, TYPE_DWORD);   
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10702999", TYPE_DWORD);   
+MemoryOffset("0", 76, TYPE_DWORD);   
+MemoryOffset("0", 84, TYPE_DWORD);   
+MemoryOffset("0", 96, TYPE_DWORD);   
+MemoryOffset("1", 100, TYPE_DWORD);   
+MemoryOffset("0", 104, TYPE_DWORD);   
+MemoryWrite("10124002", 0x50, TYPE_DWORD);   
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10702001", TYPE_DWORD);   
+MemoryOffset("0", 76, TYPE_DWORD);   
+MemoryOffset("0", 84, TYPE_DWORD);   
+MemoryOffset("0", 96, TYPE_DWORD);   
+MemoryOffset("1", 100, TYPE_DWORD);   
+MemoryOffset("0", 104, TYPE_DWORD);   
+MemoryWrite("10124002", 0x50, TYPE_DWORD);   
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10604001", TYPE_DWORD);   
+MemoryOffset("0", 76, TYPE_DWORD);   
+MemoryOffset("0", 84, TYPE_DWORD);   
+MemoryOffset("0", 96, TYPE_DWORD);   
+MemoryOffset("1", 100, TYPE_DWORD);   
+MemoryOffset("0", 104, TYPE_DWORD);   
+MemoryWrite("10124002", 0x50, TYPE_DWORD);   
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("361002131", TYPE_DWORD);   
+MemoryOffset("100511", 0x40, TYPE_DWORD);   
+MemoryWrite("0", -52, TYPE_DWORD);   
+MemoryWrite("0", -48, TYPE_DWORD);   
+MemoryWrite("0", -44, TYPE_DWORD);   
+MemoryWrite("0", -40, TYPE_DWORD);   
+MemoryWrite("0", -36, TYPE_DWORD);   
+MemoryWrite("0", -32, TYPE_DWORD);   
+MemoryWrite("0", -24, TYPE_DWORD);   
+MemoryWrite("0", -20, TYPE_DWORD);   
+MemoryWrite("0", -4, TYPE_DWORD);   
+MemoryWrite("0", 4, TYPE_DWORD);   
+MemoryWrite("0", 28, TYPE_DWORD);   
+MemoryWrite("0", 32, TYPE_DWORD);
+break;
+case 1002: // ["MELEE | SPEAR loyalty"]) {
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10720001", TYPE_DWORD);
+    MemoryOffset("6169", -0x10, TYPE_DWORD);
+    MemoryWrite("100935", 0x4, TYPE_DWORD);
+    MemoryWrite("10720002", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10720201", TYPE_DWORD);
+    MemoryOffset("6169", -0x10, TYPE_DWORD);
+    MemoryWrite("100935", 0x4, TYPE_DWORD);
+    MemoryWrite("10720002", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10720001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("180", 0x4C, TYPE_DWORD);
+    MemoryOffset("160", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200250", 0x24, TYPE_DWORD);
+    MemoryWrite("300240", 0x28, TYPE_DWORD);
+    MemoryWrite("0", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10720001", TYPE_DWORD);
+    MemoryOffset("361006092", 0xA0, TYPE_DWORD);
+    MemoryWrite("92758", -0xC, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10720002", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10720002", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10720002", 0x50, TYPE_DWORD);
+break;
+    case 1003: // MELEE | SAI LiangZhai"
+
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10718001", TYPE_DWORD);
+    MemoryOffset("6167", -0x10, TYPE_DWORD);
+    MemoryWrite("100756", 0x4, TYPE_DWORD);
+    MemoryWrite("10718002", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10718201", TYPE_DWORD);
+    MemoryOffset("6167", -0x10, TYPE_DWORD);
+    MemoryWrite("100756", 0x4, TYPE_DWORD);
+    MemoryWrite("10718002", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10718001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("180", 0x4C, TYPE_DWORD);
+    MemoryOffset("160", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200218", 0x24, TYPE_DWORD);
+    MemoryWrite("300208", 0x28, TYPE_DWORD);
+    MemoryWrite("0", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10718001", TYPE_DWORD);
+    MemoryOffset("10521210", 0xA0, TYPE_DWORD);
+    MemoryWrite("86347", -0xC, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10718002", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10718002", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10718002", 0x50, TYPE_DWORD);
+break;
+    case 1004: // Mythic | Ghost - Eternal Siege (Final)
+
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("710001101", TYPE_DWORD);
+    MemoryOffset("710001102", 0x4, TYPE_DWORD);
+    MemoryOffset("0", -0x4, TYPE_DWORD);
+    MemoryOffset("0", -0x8, TYPE_DWORD);
+    MemoryWrite("710004376", -12, TYPE_DWORD);
+    MemoryWrite("0", -16, TYPE_DWORD);
+    MemoryWrite("710004375", -24, TYPE_DWORD);
+    MemoryWrite("710004374", -28, TYPE_DWORD);
+    MemoryWrite("100000086", -32, TYPE_DWORD);
+    MemoryWrite("0", -36, TYPE_DWORD);
+    MemoryWrite("0", -40, TYPE_DWORD);
+    MemoryWrite("710004375", -44, TYPE_DWORD);
+    MemoryWrite("0", -48, TYPE_DWORD);
+    MemoryWrite("0", -52, TYPE_DWORD);
+    MemoryWrite("0", -56, TYPE_DWORD);
+    MemoryWrite("0", -60, TYPE_DWORD);
+    MemoryWrite("0", -64, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("180300004", TYPE_DWORD);
+    MemoryOffset("0", -20, TYPE_DWORD);
+    MemoryWrite("5", -16, TYPE_DWORD);
+    MemoryWrite("289900802", -12, TYPE_DWORD);
+    MemoryWrite("1", -8, TYPE_DWORD);
+    MemoryWrite("439001033", -4, TYPE_DWORD);
+    MemoryWrite("439001032", 4, TYPE_DWORD);
+    MemoryWrite("439001034", 8, TYPE_DWORD);
+    MemoryWrite("0", 12, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("100301208", TYPE_DWORD);
+    MemoryOffset("1880000001", -28, TYPE_DWORD);
+    MemoryWrite("500100001", -72, TYPE_DWORD);
+    MemoryWrite("0", -68, TYPE_DWORD);
+    MemoryWrite("280400005", -64, TYPE_DWORD);
+    MemoryWrite("280600008", -60, TYPE_DWORD);
+    MemoryWrite("1", -44, TYPE_DWORD);
+    MemoryWrite("5", -36, TYPE_DWORD);
+    MemoryWrite("2", 12, TYPE_DWORD);
+    MemoryWrite("4", 48, TYPE_DWORD);
+    MemoryWrite("30007", 52, TYPE_DWORD);
+    MemoryWrite("10000", 60, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("30007", TYPE_DWORD);
+    MemoryOffset("500000527", 0xC, TYPE_DWORD);
+    MemoryWrite("280900002", -0x8, TYPE_DWORD);
+break;
+    case 1005: //Mythic | Siren - Siren Song (Final)
+
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("710001101", TYPE_DWORD);
+    MemoryOffset("710001102", 0x4, TYPE_DWORD);
+    MemoryOffset("0", -0x4, TYPE_DWORD);
+    MemoryOffset("0", -0x8, TYPE_DWORD);
+    MemoryWrite("710003841", -12, TYPE_DWORD);
+    MemoryWrite("0", -16, TYPE_DWORD);
+    MemoryWrite("710003840", -24, TYPE_DWORD);
+    MemoryWrite("710003839", -28, TYPE_DWORD);
+    MemoryWrite("710000042", -32, TYPE_DWORD);
+    MemoryWrite("0", -36, TYPE_DWORD);
+    MemoryWrite("0", -40, TYPE_DWORD);
+    MemoryWrite("710003840", -44, TYPE_DWORD);
+    MemoryWrite("0", -48, TYPE_DWORD);
+    MemoryWrite("0", -52, TYPE_DWORD);
+    MemoryWrite("0", -56, TYPE_DWORD);
+    MemoryWrite("1", -60, TYPE_DWORD);
+    MemoryWrite("1", -64, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("180300004", TYPE_DWORD);
+    MemoryOffset("0", -20, TYPE_DWORD);
+    MemoryWrite("5", -16, TYPE_DWORD);
+    MemoryWrite("700018202", -12, TYPE_DWORD);
+    MemoryWrite("1", -8, TYPE_DWORD);
+    MemoryWrite("439001022", -4, TYPE_DWORD);
+    MemoryWrite("439001021", 4, TYPE_DWORD);
+    MemoryWrite("439001023", 8, TYPE_DWORD);
+    MemoryWrite("0", 12, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("100301208", TYPE_DWORD);
+    MemoryOffset("1880000001", -28, TYPE_DWORD);
+    MemoryWrite("500300010", -72, TYPE_DWORD);
+    MemoryWrite("0", -68, TYPE_DWORD);
+    MemoryWrite("0", -64, TYPE_DWORD);
+    MemoryWrite("0", -60, TYPE_DWORD);
+    MemoryWrite("1", -44, TYPE_DWORD);
+    MemoryWrite("5", -36, TYPE_DWORD);
+    MemoryWrite("2", 12, TYPE_DWORD);
+    MemoryWrite("3", 48, TYPE_DWORD);
+    MemoryWrite("30005", 52, TYPE_DWORD);
+    MemoryWrite("10000", 60, TYPE_DWORD);
+break;
+    case 1006: //Leg | Nyx - Starstruck
+    SetSearchRange(A_ANONMYOUS);
+MemorySearch("710001101", TYPE_DWORD);
+MemoryOffset("710001102", 0x4, TYPE_DWORD);
+MemoryOffset("0", -0x4, TYPE_DWORD);
+MemoryOffset("0", -0x8, TYPE_DWORD);
+MemoryWrite("710003069", -12, TYPE_DWORD);
+MemoryWrite("0", -16, TYPE_DWORD);
+MemoryWrite("710003068", -24, TYPE_DWORD);
+MemoryWrite("710003067", -28, TYPE_DWORD);
+MemoryWrite("710000042", -32, TYPE_DWORD);
+MemoryWrite("0", -36, TYPE_DWORD);
+MemoryWrite("289900260", -40, TYPE_DWORD);
+MemoryWrite("710003068", -44, TYPE_DWORD);
+MemoryWrite("0", -48, TYPE_DWORD);
+MemoryWrite("0", -52, TYPE_DWORD);
+MemoryWrite("0", -56, TYPE_DWORD);
+MemoryWrite("1", -60, TYPE_DWORD);
+MemoryWrite("1", -64, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("180300004", TYPE_DWORD);
+MemoryOffset("0", -20, TYPE_DWORD);
+MemoryWrite("4", -16, TYPE_DWORD);
+MemoryWrite("310000968", -12, TYPE_DWORD);
+MemoryWrite("0", -8, TYPE_DWORD);
+MemoryWrite("0", -4, TYPE_DWORD);
+MemoryWrite("700010212", 4, TYPE_DWORD);
+MemoryWrite("700010213", 8, TYPE_DWORD);
+MemoryWrite("0", 12, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("100301208", TYPE_DWORD);
+MemoryOffset("1880000001", -28, TYPE_DWORD);
+MemoryWrite("500300044", -72, TYPE_DWORD);
+MemoryWrite("0", -68, TYPE_DWORD);
+MemoryWrite("0", -64, TYPE_DWORD);
+MemoryWrite("0", -60, TYPE_DWORD);
+MemoryWrite("0", -44, TYPE_DWORD);
+MemoryWrite("4", -36, TYPE_DWORD);
+MemoryWrite("2", 12, TYPE_DWORD);
+MemoryWrite("0", 48, TYPE_DWORD);
+MemoryWrite("10012", 52, TYPE_DWORD);
+MemoryWrite("2000", 60, TYPE_DWORD);
+    
+    
+    case 1007: //Leg | Nikto - Dark Side
+    SetSearchRange(A_ANONMYOUS);
+MemorySearch("710001101", TYPE_DWORD);
+MemoryOffset("710001102", 0x4, TYPE_DWORD);
+MemoryOffset("0", -0x4, TYPE_DWORD);
+MemoryOffset("0", -0x8, TYPE_DWORD);
+MemoryWrite("710000892", -12, TYPE_DWORD);
+MemoryWrite("0", -16, TYPE_DWORD);
+MemoryWrite("710000891", -24, TYPE_DWORD);
+MemoryWrite("710000893", -28, TYPE_DWORD);
+MemoryWrite("100000086", -32, TYPE_DWORD);
+MemoryWrite("0", -36, TYPE_DWORD);
+MemoryWrite("310000170", -40, TYPE_DWORD);
+MemoryWrite("710000891", -44, TYPE_DWORD);
+MemoryWrite("0", -48, TYPE_DWORD);
+MemoryWrite("0", -52, TYPE_DWORD);
+MemoryWrite("0", -56, TYPE_DWORD);
+MemoryWrite("0", -60, TYPE_DWORD);
+MemoryWrite("0", -64, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("180300004", TYPE_DWORD);
+MemoryOffset("0", -20, TYPE_DWORD);
+MemoryWrite("4", -16, TYPE_DWORD);
+MemoryWrite("310000968", -12, TYPE_DWORD);
+MemoryWrite("0", -8, TYPE_DWORD);
+MemoryWrite("0", -4, TYPE_DWORD);
+MemoryWrite("700010068", 4, TYPE_DWORD);
+MemoryWrite("700010069", 8, TYPE_DWORD);
+MemoryWrite("0", 12, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("100301208", TYPE_DWORD);
+MemoryOffset("1880000001", -28, TYPE_DWORD);
+MemoryWrite("500100010", -72, TYPE_DWORD);
+MemoryWrite("0", -68, TYPE_DWORD);
+MemoryWrite("0", -64, TYPE_DWORD);
+MemoryWrite("0", -60, TYPE_DWORD);
+MemoryWrite("0", -44, TYPE_DWORD);
+MemoryWrite("4", -36, TYPE_DWORD);
+MemoryWrite("2", 12, TYPE_DWORD);
+MemoryWrite("0", 48, TYPE_DWORD);
+MemoryWrite("10001", 52, TYPE_DWORD);
+MemoryWrite("2000", 60, TYPE_DWORD);
+break;
+       case 1008: //"Leg | Reaper - Ashura"
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("710001101", TYPE_DWORD);
+    MemoryOffset("710001102", 0x4, TYPE_DWORD);
+    MemoryOffset("0", -0x4, TYPE_DWORD);
+    MemoryOffset("0", -0x8, TYPE_DWORD);
+    MemoryWrite("710001592", -12, TYPE_DWORD);
+    MemoryWrite("0", -16, TYPE_DWORD);
+    MemoryWrite("710001591", -24, TYPE_DWORD);
+    MemoryWrite("710001611", -28, TYPE_DWORD);
+    MemoryWrite("100000086", -32, TYPE_DWORD);
+    MemoryWrite("0", -36, TYPE_DWORD);
+    MemoryWrite("310000238", -40, TYPE_DWORD);
+    MemoryWrite("710001591", -44, TYPE_DWORD);
+    MemoryWrite("0", -48, TYPE_DWORD);
+    MemoryWrite("0", -52, TYPE_DWORD);
+    MemoryWrite("0", -56, TYPE_DWORD);
+    MemoryWrite("0", -60, TYPE_DWORD);
+    MemoryWrite("0", -64, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("180300004", TYPE_DWORD);
+    MemoryOffset("0", -20, TYPE_DWORD);
+    MemoryWrite("4", -16, TYPE_DWORD);
+    MemoryWrite("310000968", -12, TYPE_DWORD);
+    MemoryWrite("0", -8, TYPE_DWORD);
+    MemoryWrite("0", -4, TYPE_DWORD);
+    MemoryWrite("439001007", 4, TYPE_DWORD);
+    MemoryWrite("439001008", 8, TYPE_DWORD);
+    MemoryWrite("0", 12, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("100301208", TYPE_DWORD);
+    MemoryOffset("1880000001", -28, TYPE_DWORD);
+    MemoryWrite("500200007", -72, TYPE_DWORD);
+    MemoryWrite("0", -68, TYPE_DWORD);
+    MemoryWrite("0", -64, TYPE_DWORD);
+    MemoryWrite("0", -60, TYPE_DWORD);
+    MemoryWrite("0", -44, TYPE_DWORD);
+    MemoryWrite("4", -36, TYPE_DWORD);
+    MemoryWrite("2", 12, TYPE_DWORD);
+    MemoryWrite("0", 48, TYPE_DWORD);
+    MemoryWrite("10004", 52, TYPE_DWORD);
+    MemoryWrite("2000", 60, TYPE_DWORD);
+break;
+    case 1009: //"SMG | GKRS Legendaryv91"
+
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10412001", TYPE_DWORD);
+    MemoryOffset("2063", -0x10, TYPE_DWORD);
+    MemoryWrite("10311", 0x4, TYPE_DWORD);
+    MemoryWrite("10412025", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10412201", TYPE_DWORD);
+    MemoryOffset("2063", -0x10, TYPE_DWORD);
+    MemoryWrite("10311", 0x4, TYPE_DWORD);
+    MemoryWrite("10412025", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10412001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("50", 0x4C, TYPE_DWORD);
+    MemoryOffset("30", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200059", 0x24, TYPE_DWORD);
+    MemoryWrite("300054", 0x28, TYPE_DWORD);
+    MemoryWrite("0", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("100022", 0x34, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10412001", TYPE_DWORD);
+    MemoryOffset("10411215", 0xA0, TYPE_DWORD);
+    MemoryWrite("200010269", -0xC, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10412025", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10412025", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10412025", 0x50, TYPE_DWORD);
+   break; 
+    case 1010: //"SMG | FENNEC Dragon"
+
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10415001", TYPE_DWORD);
+    MemoryOffset("2066", -0x10, TYPE_DWORD);
+    MemoryWrite("100923", 0x4, TYPE_DWORD);
+    MemoryWrite("10415077", 0x8, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10415201", TYPE_DWORD);
+    MemoryOffset("2066", -0x10, TYPE_DWORD);
+    MemoryWrite("100923", 0x4, TYPE_DWORD);
+    MemoryWrite("10415077", 0x8, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10415001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("50", 0x4C, TYPE_DWORD);
+    MemoryOffset("30", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200247", 0x24, TYPE_DWORD);
+    MemoryWrite("300237", 0x28, TYPE_DWORD);
+    MemoryWrite("50", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10415001", TYPE_DWORD);
+    MemoryOffset("10414215", 0xA0, TYPE_DWORD);
+    MemoryWrite("92794", -0xC, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10415077", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10415077", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10415077", 0x50, TYPE_DWORD);
+break;
+    case 1011: //"SMG | PP19 BizonOathsDefiance"
+
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10418001", TYPE_DWORD);
+    MemoryOffset("2071", -0x10, TYPE_DWORD);
+    MemoryWrite("100688", 0x4, TYPE_DWORD);
+    MemoryWrite("10418049", 0x8, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10418201", TYPE_DWORD);
+    MemoryOffset("2071", -0x10, TYPE_DWORD);
+    MemoryWrite("100688", 0x4, TYPE_DWORD);
+    MemoryWrite("10418049", 0x8, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10418001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("50", 0x4C, TYPE_DWORD);
+    MemoryOffset("30", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200205", 0x24, TYPE_DWORD);
+    MemoryWrite("300198", 0x28, TYPE_DWORD);
+    MemoryWrite("0", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10418001", TYPE_DWORD);
+    MemoryOffset("10417215", 0xA0, TYPE_DWORD);
+    MemoryWrite("84326", -0xC, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10418049", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10418049", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10418049", 0x50, TYPE_DWORD);
+break;
+    case 1012: //"SMG | MX9 FireDragon"
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10419001", TYPE_DWORD);
+    MemoryOffset("2072", -0x10, TYPE_DWORD);
+    MemoryWrite("10900", 0x4, TYPE_DWORD);
+    MemoryWrite("10419002", 0x8, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10419201", TYPE_DWORD);
+    MemoryOffset("2072", -0x10, TYPE_DWORD);
+    MemoryWrite("10900", 0x4, TYPE_DWORD);
+    MemoryWrite("10419002", 0x8, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10419001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("50", 0x4C, TYPE_DWORD);
+    MemoryOffset("30", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200083", 0x24, TYPE_DWORD);
+    MemoryWrite("300075", 0x28, TYPE_DWORD);
+    MemoryWrite("0", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10419001", TYPE_DWORD);
+    MemoryOffset("10418215", 0xA0, TYPE_DWORD);
+    MemoryWrite("200011015", -0xC, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10419002", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10419002", 0x50, TYPE_DWORD);
+    
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10419002", 0x50, TYPE_DWORD);
+break;
+    case 1013: //"SMG | MX9 HeartlessPrestige"
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10604001", TYPE_DWORD);
+MemoryOffset("0", 76, TYPE_DWORD);
+MemoryOffset("0", 84, TYPE_DWORD);
+MemoryOffset("0", 96, TYPE_DWORD);
+MemoryOffset("1", 100, TYPE_DWORD);
+MemoryOffset("0", 104, TYPE_DWORD);
+MemoryWrite("10419035", 0x50, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10702001", TYPE_DWORD);
+MemoryOffset("0", 76, TYPE_DWORD);
+MemoryOffset("0", 84, TYPE_DWORD);
+MemoryOffset("0", 96, TYPE_DWORD);
+MemoryOffset("1", 100, TYPE_DWORD);
+MemoryOffset("0", 104, TYPE_DWORD);
+MemoryWrite("10419035", 0x50, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10702999", TYPE_DWORD);
+MemoryOffset("0", 76, TYPE_DWORD);
+MemoryOffset("0", 84, TYPE_DWORD);
+MemoryOffset("0", 96, TYPE_DWORD);
+MemoryOffset("1", 100, TYPE_DWORD);
+MemoryOffset("0", 104, TYPE_DWORD);
+MemoryWrite("10419035", 0x50, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10419001", TYPE_DWORD);
+MemoryOffset("10418215", 0xA0, TYPE_DWORD);
+MemoryWrite("79059", -0xC, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10419001", TYPE_DWORD);
+MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+MemoryOffset("50", 0x4C, TYPE_DWORD);
+MemoryOffset("30", 0x54, TYPE_DWORD);
+MemoryWrite("4", 0x8, TYPE_DWORD);
+MemoryWrite("0", 0x1C, TYPE_DWORD);
+MemoryWrite("0", 0x20, TYPE_DWORD);
+MemoryWrite("200174", 0x24, TYPE_DWORD);
+MemoryWrite("300167", 0x28, TYPE_DWORD);
+MemoryWrite("0", 0x2C, TYPE_DWORD);
+MemoryWrite("0", 0x30, TYPE_DWORD);
+MemoryWrite("0", 0x34, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10419201", TYPE_DWORD);
+MemoryOffset("2072", -0x10, TYPE_DWORD);
+MemoryWrite("100540", 0x4, TYPE_DWORD);
+MemoryWrite("10419035", 0x8, TYPE_DWORD);
+
+SetSearchRange(A_ANONMYOUS);
+MemorySearch("10419001", TYPE_DWORD);
+MemoryOffset("2072", -0x10, TYPE_DWORD);
+MemoryWrite("100540", 0x4, TYPE_DWORD);
+MemoryWrite("10419035", 0x8, TYPE_DWORD);
+break;    
+      case 1014: //"SMG | PPSh41 GaiseiBusitsu"
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10421001", TYPE_DWORD);
+    MemoryOffset("2074", -0x10, TYPE_DWORD);
+    MemoryWrite("100397", 0x4, TYPE_DWORD);
+    MemoryWrite("10421011", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10421201", TYPE_DWORD);
+    MemoryOffset("2074", -0x10, TYPE_DWORD);
+    MemoryWrite("100397", 0x4, TYPE_DWORD);
+    MemoryWrite("10421011", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10421001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("50", 0x4C, TYPE_DWORD);
+    MemoryOffset("30", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200145", 0x24, TYPE_DWORD);
+    MemoryWrite("300138", 0x28, TYPE_DWORD);
+    MemoryWrite("0", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10421001", TYPE_DWORD);
+    MemoryOffset("10420201", 0xA0, TYPE_DWORD);
+    MemoryWrite("73161", -0xC, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10421011", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10421011", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10421011", 0x50, TYPE_DWORD);
+break;
+      case 1015: //" | DL Q33 Zealot"
+
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10207001", TYPE_DWORD);
+    MemoryOffset("1035", -0x10, TYPE_DWORD);
+    MemoryWrite("10634", 0x4, TYPE_DWORD);
+    MemoryWrite("10207068", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10207201", TYPE_DWORD);
+    MemoryOffset("1035", -0x10, TYPE_DWORD);
+    MemoryWrite("10634", 0x4, TYPE_DWORD);
+    MemoryWrite("10207068", 0x8, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10207001", TYPE_DWORD);
+    MemoryOffset("1880000001", 0x14, TYPE_DWORD);
+    MemoryOffset("50", 0x4C, TYPE_DWORD);
+    MemoryOffset("30", 0x54, TYPE_DWORD);
+    MemoryWrite("4", 0x8, TYPE_DWORD);
+    MemoryWrite("0", 0x1C, TYPE_DWORD);
+    MemoryWrite("0", 0x20, TYPE_DWORD);
+    MemoryWrite("200030", 0x24, TYPE_DWORD);
+    MemoryWrite("300022", 0x28, TYPE_DWORD);
+    MemoryWrite("0", 0x2C, TYPE_DWORD);
+    MemoryWrite("0", 0x30, TYPE_DWORD);
+    MemoryWrite("0", 0x34, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10207001", TYPE_DWORD);
+    MemoryOffset("10206004", 0xA0, TYPE_DWORD);
+    MemoryWrite("200010129", -0xC, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10207068", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10207068", 0x50, TYPE_DWORD);
+
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10604001", TYPE_DWORD);
+    MemoryOffset("0", 76, TYPE_DWORD);
+    MemoryOffset("0", 84, TYPE_DWORD);
+    MemoryOffset("0", 96, TYPE_DWORD);
+    MemoryOffset("1", 100, TYPE_DWORD);
+    MemoryOffset("0", 104, TYPE_DWORD);
+    MemoryWrite("10207068", 0x50, TYPE_DWORD);
+
+    
+        
+            
+                    
+    break;
+    }
+    return 0;
+}

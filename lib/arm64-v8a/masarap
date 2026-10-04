@@ -1,0 +1,49 @@
+#include "MemoryTools.h"
+#define TYPE_DWORD 4  // Represents a DWORD size, 4 bytes
+
+
+
+int main(int argc, char **argv)
+{
+	killGG();					// Kill Game Guardian if running
+
+	int gs;						// For storing the number of data items 
+	void *jg;					// For storing results 
+	char *bm = "com.garena.game.codm";	// Package name 
+
+	BypassGameSafe();			// Assuming this function bypasses game
+								// security 
+
+	// Ensure that you are using the correct command line argument (Fitur
+	// selection) 
+	if (argc < 2)
+	{
+		printf("Error: Please provide a valid feature number.\n");
+		return 1;
+	}
+
+	// Convert the argument to an integer (used to select the feature to
+	// execute) 
+	int Fitur = atoi(argv[1]);
+
+	switch (Fitur)
+	{
+	case 1000:					// Tang knife feature 
+            SetSearchRange(A_ANONMYOUS);  // Set anonymous memory search range
+            MemorySearch(0x10702999, TYPE_DWORD);  // Search for specific memory address
+            MemoryOffset(6145, -16, TYPE_DWORD);  // Offset calculation
+            MemoryWrite(100424, 4, TYPE_DWORD);  // Write value to memory
+            MemoryWrite(0x10717001, 8, TYPE_DWORD);  // Write another value to memory
+
+            // Second memory modification
+            SetSearchRange(A_ANONMYOUS);  // Set anonymous memory search range again
+            MemorySearch(0x10702201, TYPE_DWORD);  // Search for another memory address
+            MemoryOffset(6145, -16, TYPE_DWORD);  // Offset calculation
+            MemoryWrite(100424, 4, TYPE_DWORD);  // Write value to memory
+            MemoryWrite(0x10717001, 8, TYPE_DWORD);  // Write another value to memory
+		break;
+	}
+
+	return 0;
+
+}

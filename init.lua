@@ -1,0 +1,29 @@
+--名称
+appname="𝖪𝖨𝖱𝖮 𝖨𝖭𝖩𝖤𝖢𝖳𝖮𝖱 𝖵1"
+--版本号
+appver="1.6.57"
+--版本
+appcode="1"
+--SDK
+appsdk="21"
+--包名
+packagename="com.kiro.v1"
+--调试模式
+debugmode=false
+--应用权限
+user_permission={
+  "ACCESS_NETWORK_STATE",
+  "CLEAR_APP_CACHE",
+  "DOWNLOAD_WITHOUT_NOTIFICATION",
+  "INTERNET",
+  "KILL_BACKGROUND_PROCESSES",
+  "READ_EXTERNAL_STORAGE",
+  "READ_PHONE_STATE",
+  "SYSTEM_ALERT_WINDOW",
+  "WRITE_EXTERNAL_STORAGE",
+  "WRITE_SETTINGS",
+}
+--跳过编译
+skip_compilation={
+
+}

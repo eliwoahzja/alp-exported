@@ -1,0 +1,50 @@
+#include <iostream>
+#include <vector>
+#include "MemoryTools.h"
+
+
+int main(int argc, char **argv) {
+    char packageName[] = "com.garena.game.codm";
+    char getRoot[100];
+    if (getuid() == 0) {
+        sprintf(getRoot, "MODE_ROOT");
+    } else {
+        sprintf(getRoot, "MODE_NO_ROOT");
+    }
+    killGG();
+    int Fitur = atoi(argv[1]);
+    initXMemoryTools(packageName, getRoot);
+    switch (Fitur) {
+    case 1003: // tang knife
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("6145", -16, TYPE_DWORD);
+    MemoryWrite("100424", 4, TYPE_DWORD);
+    MemoryWrite("10717001", 8, TYPE_DWORD);
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702201", TYPE_DWORD);
+    MemoryOffset("6145", -16, TYPE_DWORD);
+    MemoryWrite("100424", 4, TYPE_DWORD);
+    MemoryWrite("10717001", 8, TYPE_DWORD);
+    break;
+    case 999: // longquan
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("6145",  -0x10, TYPE_DWORD);
+    MemoryWrite("100897",  0x4, TYPE_DWORD);
+    MemoryWrite("10702670",  0x8, TYPE_DWORD);
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702201", TYPE_DWORD);
+    MemoryOffset("6145",  -0x10, TYPE_DWORD);
+    MemoryWrite("100897",  0x4, TYPE_DWORD);
+    MemoryWrite("10702670",  0x8, TYPE_DWORD);
+    SetSearchRange(A_ANONMYOUS);
+    MemorySearch("10702999", TYPE_DWORD);
+    MemoryOffset("851968",  -0x14, TYPE_DWORD);
+    MemoryWrite("0",  -0xC, TYPE_DWORD);
+    MemoryWrite("300234",  -0x8, TYPE_DWORD);
+    MemoryWrite("0",  -0x14, TYPE_DWORD);
+    break;
+    }
+    return 0;
+}
