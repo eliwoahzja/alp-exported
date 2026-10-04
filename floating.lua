@@ -233,17 +233,17 @@
                       };
 
                       {
-                      // 1dp hairline above a section row (iOS grouped list).
-                                              View;
+                        -- 1dp hairline separator above a section row (iOS list).
+                        TextView;
+                        text="";
                         layout_width="match_parent";
                         layout_height="1dp";
-                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                        backgroundColor="0xFF38383A";
                       };
                       {
 
                         LinearLayout;
                         orientation="horizontal";
-                        // iOS disclosure row: full-bleed, no card background.
                         layout_height="46dp";
                         layout_width="match_parent";
                         id="espmenu";
@@ -276,8 +276,6 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu1";
-                        // 8dp side padding so the option rows are not glued
-                        // to the panel edge (iOS list inset).
                         paddingLeft="8dp";
                         paddingRight="8dp";
                         visibility="gone";
@@ -356,17 +354,17 @@
                       };
 
                       {
-                      // 1dp hairline above a section row (iOS grouped list).
-                                              View;
+                        -- 1dp hairline separator above a section row (iOS list).
+                        TextView;
+                        text="";
                         layout_width="match_parent";
                         layout_height="1dp";
-                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                        backgroundColor="0xFF38383A";
                       };
                       {
 
                         LinearLayout;
                         orientation="horizontal";
-                        // iOS disclosure row: full-bleed, no card background.
                         layout_height="46dp";
                         layout_width="match_parent";
                         id="fpsmenu";
@@ -399,8 +397,6 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu4";
-                        // 8dp side padding so the option rows are not glued
-                        // to the panel edge (iOS list inset).
                         paddingLeft="8dp";
                         paddingRight="8dp";
                         visibility="gone";
@@ -455,16 +451,16 @@
                       };
 
                       {
-                      // 1dp hairline above a section row (iOS grouped list).
-                                              View;
+                        -- 1dp hairline separator above a section row (iOS list).
+                        TextView;
+                        text="";
                         layout_width="match_parent";
                         layout_height="1dp";
-                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                        backgroundColor="0xFF38383A";
                       };
                       {
                         LinearLayout;
                         orientation="horizontal";
-                        // iOS disclosure row: full-bleed, no card background.
                         layout_height="46dp";
                         layout_width="match_parent";
                         id="aimmenu";
@@ -498,8 +494,6 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu2";
-                        // 8dp side padding so the option rows are not glued
-                        // to the panel edge (iOS list inset).
                         paddingLeft="8dp";
                         paddingRight="8dp";
                         visibility="gone";
@@ -615,16 +609,16 @@
                         }
                       },
                       {
-                      // 1dp hairline above a section row (iOS grouped list).
-                                              View;
+                        -- 1dp hairline separator above a section row (iOS list).
+                        TextView;
+                        text="";
                         layout_width="match_parent";
                         layout_height="1dp";
-                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                        backgroundColor="0xFF38383A";
                       };
                       {
                         LinearLayout;
                         orientation="horizontal";
-                        // iOS disclosure row: full-bleed, no card background.
                         layout_height="46dp";
                         layout_width="match_parent";
                         id="othermenu";
@@ -657,8 +651,6 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu3";
-                        // 8dp side padding so the option rows are not glued
-                        // to the panel edge (iOS list inset).
                         paddingLeft="8dp";
                         paddingRight="8dp";
                         visibility="gone";
@@ -930,17 +922,17 @@
 
 
                       {
-                      // 1dp hairline above a section row (iOS grouped list).
-                                              View;
+                        -- 1dp hairline separator above a section row (iOS list).
+                        TextView;
+                        text="";
                         layout_width="match_parent";
                         layout_height="1dp";
-                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                        backgroundColor="0xFF38383A";
                       };
                       {
 
                         LinearLayout;
                         orientation="horizontal";
-                        // iOS disclosure row: full-bleed, no card background.
                         layout_height="46dp";
                         layout_width="match_parent";
                         id="brmenu";
@@ -973,8 +965,6 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu5";
-                        // 8dp side padding so the option rows are not glued
-                        // to the panel edge (iOS list inset).
                         paddingLeft="8dp";
                         paddingRight="8dp";
                         visibility="gone";
@@ -1036,16 +1026,16 @@
 
 
                       {
-                      // 1dp hairline above a section row (iOS grouped list).
-                                              View;
+                        -- 1dp hairline separator above a section row (iOS list).
+                        TextView;
+                        text="";
                         layout_width="match_parent";
                         layout_height="1dp";
-                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                        backgroundColor="0xFF38383A";
                       };
                       {
                         LinearLayout;
                         orientation="horizontal";
-                        // iOS disclosure row: full-bleed, no card background.
                         layout_height="46dp";
                         layout_width="match_parent";
                         id="skinmenu";
@@ -1078,8 +1068,6 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu6";
-                        // 8dp side padding so the option rows are not glued
-                        // to the panel edge (iOS list inset).
                         paddingLeft="8dp";
                         paddingRight="8dp";
                         visibility="gone";
@@ -1968,16 +1956,16 @@
 
 
                       {
-                      // 1dp hairline above a section row (iOS grouped list).
-                                              View;
+                        -- 1dp hairline separator above a section row (iOS list).
+                        TextView;
+                        text="";
                         layout_width="match_parent";
                         layout_height="1dp";
-                        backgroundColor="0xFF38383A"; -- iOS hairline separator
+                        backgroundColor="0xFF38383A";
                       };
                       {
                         LinearLayout;
                         orientation="horizontal";
-                        // iOS disclosure row: full-bleed, no card background.
                         layout_height="46dp";
                         layout_width="match_parent";
                         id="antennamenu";
@@ -2010,8 +1998,6 @@
                         layout_height="match_parent",
                         orientation="vertical";
                         id="menu7";
-                        // 8dp side padding so the option rows are not glued
-                        // to the panel edge (iOS list inset).
                         paddingLeft="8dp";
                         paddingRight="8dp";
                         visibility="gone";
