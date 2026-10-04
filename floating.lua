@@ -75,68 +75,53 @@
         layout_gravity="center";
         id="fl";
         {
+          -- ONE row: title on the left, the two action icons on the right.
+          -- The old layout stacked the icons BELOW the title inside this
+          -- 44dp card, which pushed the minimize button off-screen.
           LinearLayout;
-          layout_height="wrap";
           layout_width="match_parent";
-          orientation="horizontal";
-          layout_gravity="center";
-          padding="8dp";
-          {
-            LinearLayout;
-            layout_height="wrap";
-            layout_width="match_parent";
-            orientation="vertical";
-            layout_gravity="center";
-            {
-              LinearLayout;
-              layout_height="wrap";
-              layout_width="match_parent";
-              orientation="vertical";
-              layout_gravity="center",
-              {
-
-                TextView;
-                text="KIRO PREMIUM"; -- plain text now: the unicode small-caps
-                                    -- font made the title hard to read
-                textColor="0xFFE5E5EA";
-                textSize = "14sp";
-                id="";
-                layout_gravity="left|center_vertical";
-                layout_width="wrap";
-                layout_height="wrap";
-                paddingLeft="6dp";
-              };
-            };
-          };
-        {
-          LinearLayout;
-          orientation="horizontal";
           layout_height="match_parent";
-          layout_width="match_parent";
-          gravity="right";
-          background="transparent",
+          orientation="horizontal";
+          gravity="center_vertical";
+          paddingLeft="14dp";
+          paddingRight="10dp";
           {
+            -- Title. 0dp width + weight 1 = "fill the space the icons leave".
+            TextView;
+            text="KIRO PREMIUM";
+            textColor="0xFFE5E5EA";
+            textSize="14sp";
+            id="";
+            layout_width="0dp";
+            layout_weight="1";
+            layout_height="wrap";
+            layout_gravity="center_vertical";
+          };
+          {
+            -- Hide the menu (game stays visible).
             ImageView;
-            layout_width="30dp";
-            layout_height="30dp";
+            layout_width="24dp";
+            layout_height="24dp";
             src="icon/hidemenu.png";
-            colorFilter="0xFF64D2FF";
-            layout_gravity="center";
-            padding="5dp";
+            colorFilter="0xFF8E8E93"; -- iOS secondary grey
+            layout_gravity="center_vertical";
+            padding="4dp";
             id="eye.png";
           };
           {
+            -- Minimize to the floating bubble.
+            -- main.lua binds t1.onClick (minimize) and t1.onLongClick
+            -- (close menu) - do not rename this id.
             ImageView;
-            layout_width="30dp";
-            layout_height="30dp";
+            layout_width="24dp";
+            layout_height="24dp";
             src="icon/minimize.png";
-            colorFilter="0xFF30D158";
-            layout_gravity="center";
-            padding="5dp";
+            colorFilter="0xFF8E8E93"; -- iOS secondary grey
+            layout_gravity="center_vertical";
+            padding="4dp";
             id="t1";
           };
         };
-      };
       };
 
 {
